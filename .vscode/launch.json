@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "type": "extendscript-debug",
+            "request": "launch",
+            "name": "KBPR Script Debug",
+            "hostAppSpecifier": "photoshop",
+        }
+    ]
+}
