@@ -4,12 +4,9 @@ const pixelToMm = inchToMm / ppi;
 
 const fileName = "KBPR";
 
+preferences.rulerUnits = Units.MM;
+preferences.typeUnits = TypeUnits.MM;
 
-
-function psInit() {
-    preferences.rulerUnits = Units.MM;
-    preferences.typeUnits = TypeUnits.MM;
-}
 
 function wasteCheck(docWidth, tileSize) {
     var width = Math.floor(docWidth / tileSize.width) * tileSize.width;
@@ -29,29 +26,14 @@ function dummyCheck() {
 }
 
 
-function newDocument() {
-    $.writeln(selectedPaperSize);
-    $.writeln(selectedPaperSize.name);
-    $.writeln(selectedPaperSize.width);
-    $.writeln(selectedPaperSize.height);
-    $.writeln(selectedRollWidth);
-
-    if (!dummyCheck()) return false;
-
-    if (selectedPaperSize == PaperSizes.OTHER || selectedPaperSize == PaperSizes.POSTER || selectedPaperSize == PaperSizes.STICKER) {
-        alert("Nem implementált funkció!");
-        return false;
-    }
-
-    psInit();
-
+var documentWidth, documentHeight;
+var rotate;
+var columnNum, rowNum;
+var columnWidth, rowHeight;
+var correctedQuantity;
+function preCalcGrid() {
     var paperSize = selectedPaperSize;
-    var documentWidth = selectedRollWidth; // - 10.4; // TODO: ask Gúz
-    var documentHeight = 0;
-
-    // landscape is default, portrait is true
-    var rotate = false;
-
+    documentWidth = selectedRollWidth; // - 10.4; // TODO: ask Gúz
 
     // fits both ways
     if (paperSize.width < documentWidth && paperSize.height < documentWidth) {
@@ -71,39 +53,32 @@ function newDocument() {
         }
         else {
             // neither fits
-            alert("Nem fér el a kiválasztott méretű papíron!");
             return false;
         }
     }
 
-    var columnWidth = rotate ? paperSize.height : paperSize.width;
-    var columnNum = Math.floor(documentWidth / columnWidth);
+    columnWidth = rotate ? paperSize.height : paperSize.width;
+    columnNum = Math.floor(documentWidth / columnWidth);
 
-    var rowNum = Math.ceil(quantity / columnNum);
-    var rowHeight = rotate ? paperSize.width : paperSize.height;
+    rowNum = Math.ceil(quantity / columnNum);
+    rowHeight = rotate ? paperSize.width : paperSize.height;
 
     documentHeight = rowNum * rowHeight;
-
-    var correctedQuantity = columnNum * rowNum;
-
-
-    $.writeln("documentWidth: " + documentWidth);
-    $.writeln("documentHeight: " + documentHeight);
-
-    $.writeln("paperSize.width: " + paperSize.width);
-    $.writeln("paperSize.height: " + paperSize.height);
-
-    $.writeln("wasteLandscape: " + wasteLandscape);
-    $.writeln("wastePortrait: " + wastePortrait);
-
-    $.writeln("rotate: " + rotate);
-    $.writeln("columnNum: " + columnNum);
-    $.writeln("rowNum: " + rowNum);
-    $.writeln("columnWidth: " + columnWidth);
-    $.writeln("rowHeight: " + rowHeight);
-    $.writeln("correctedQuantity: " + correctedQuantity);
+    correctedQuantity = columnNum * rowNum;
 
 
+    // update ui
+    correctedQuantityText.text = correctedQuantity + " db";
+
+    return true;
+}
+
+function newDocument() {
+    if (!dummyCheck()) return false;
+    if (!preCalcGrid()) {
+        alert("Nem fér el a kiválasztott méretű papíron!");
+        return false;
+    }
 
     var newDocument = app.documents.add(documentWidth, documentHeight, ppi, fileName, NewDocumentMode.RGB);
 
@@ -115,16 +90,21 @@ function newDocument() {
     
     mainLayer.resize(resizePercent, resizePercent, AnchorPosition.TOPLEFT);
 
-    for (var i = 0; i < correctedQuantity - 1; i++) {
+    var finalQuantity = quantityCorrectionEnabled ? correctedQuantity : quantity;
+
+    for (var i = 0; i < finalQuantity - 1; i++) {
         mainLayer.duplicate(newDocument);
     }
 
-    for (var i = 0; i < rowNum; i++) {
+    var counter = 0;
+    for (var i = 0; i < finalQuantity; i++) {
         for (var j = 0; j < columnNum; j++) {
             newDocument.artLayers[i * columnNum + j].translate(j * columnWidth, i * rowHeight);
+            if (++counter >= quantity) break;
         }
     }
 
+    return true;
 }
 
 
