@@ -1,0 +1,1 @@
+var SecondWindow = new Window("dialog", "Second Window", undefined, { closeButton: true });
