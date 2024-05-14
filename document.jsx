@@ -38,14 +38,14 @@ function newDocument() {
     var documentHeight = 0;
 
     // landscape is default, portrait is true
-    var roate = false;
+    var rotate = false;
 
 
     // fits both ways
     if (paperSize.width < documentWidth && paperSize.height < documentWidth) {
         // check which way causes less waste
         var wastePortrait = wasteCheck(documentWidth, paperSize);
-        var wasteLandscape = wasteCheck(documentWidth, paperSize);
+        var wasteLandscape = wasteCheck(documentWidth, { width: paperSize.height, height: paperSize.width });
         rotate = wasteLandscape < wastePortrait;
     }
     else {
@@ -64,11 +64,11 @@ function newDocument() {
         }
     }
 
-    var columnWidth = rotate ? paperSize.width : paperSize.height;
+    var columnWidth = rotate ? paperSize.height : paperSize.width;
     var columnNum = Math.floor(documentWidth / columnWidth);
 
     var rowNum = Math.ceil(quantity / columnNum);
-    var rowHeight = rotate ? paperSize.height : paperSize.width;
+    var rowHeight = rotate ? paperSize.width : paperSize.height;
 
     documentHeight = rowNum * rowHeight;
 
@@ -109,7 +109,7 @@ function newDocument() {
 
     for (var i = 0; i < rowNum; i++) {
         for (var j = 0; j < columnNum; j++) {
-            newDocument.artLayers[i * columnNum + j].translate(j * (columnWidth), i * (rowHeight));
+            newDocument.artLayers[i * columnNum + j].translate(j * columnWidth, i * rowHeight);
         }
     }
 
@@ -120,7 +120,7 @@ function newDocument() {
 function copyAsLayer(file, target, rotate) {
     var doc = app.open(file);
 
-    if (doc.width > doc.height == rotate) {
+    if (rotate != doc.width > doc.height) {
         doc.rotateCanvas(90);
     }
 
