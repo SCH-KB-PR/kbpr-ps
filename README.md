@@ -10,3 +10,4 @@ ps references and goodies:
 
 ideas:
 - calculate the amount of rows needed by the data, if theres empty space at the end, fill that in for less waste (optional)
+- foldable sticker design for mass cutting

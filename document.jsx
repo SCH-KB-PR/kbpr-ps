@@ -16,6 +16,18 @@ function wasteCheck(docWidth, tileSize) {
     return (docWidth - width) * tileSize.height;
 }
 
+function dummyCheck() {
+    if (selectedMode == FileModes.FILE && selectedFile == null) {
+        alert("Nem választottál ki fájlt!");
+        return false;
+    }
+    if (selectedMode == FileModes.FOLDER && selectedFolder == null) {
+        alert("Nem választottál ki mappát!");
+        return false;
+    }
+    return true;
+}
+
 
 function newDocument() {
     $.writeln(selectedPaperSize);
@@ -26,7 +38,7 @@ function newDocument() {
 
     if (!dummyCheck()) return false;
 
-    if (selectedPaperSize == PaperSizes.OTHER || selectedPaperSize == PaperSizes.POSTER || selectedPaperSize == PaperSizes.Sticker) {
+    if (selectedPaperSize == PaperSizes.OTHER || selectedPaperSize == PaperSizes.POSTER || selectedPaperSize == PaperSizes.STICKER) {
         alert("Nem implementált funkció!");
         return false;
     }
