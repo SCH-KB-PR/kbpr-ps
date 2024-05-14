@@ -8,7 +8,7 @@ const unitWidth = 70;
 const height = 22;
 
 
-const Modes = {
+const FileModes = {
     FILE: "Fájl",
     FOLDER: "Mappa"
 };
@@ -18,7 +18,7 @@ var selectedFolder = null;
 
 var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, { closeButton: true });
 {
-    var inputGroup, filePathGroup, folderPathGroup;
+    var pathGroup, pathLabel, pathText, browseButton;
     
     mainWindow.alignChildren = "left";
     var modeSelectGroup = mainWindow.add("group");
@@ -28,61 +28,51 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
         
         // field
         var modeDropdown = modeSelectGroup.add("dropdownlist", [0, 0, dataWidth, height]);
-        modeDropdown.add("item", Modes.FILE);
-        modeDropdown.add("item", Modes.FOLDER);
+        modeDropdown.add("item", FileModes.FILE);
+        modeDropdown.add("item", FileModes.FOLDER);
         modeDropdown.selection = 0;
 
         modeDropdown.onChange = function () 
         {
-            switch (modeDropdown.selection.text)
-            {
-                case Modes.FILE:
-                    filePathGroup.show();
-                    folderPathGroup.hide();
-                    break;
-                case Modes.FOLDER:
-                    folderPathGroup.show();
-                    filePathGroup.hide();
-                    break;
-            }
+            pathModeChanged(modeDropdown.selection.text);
         }
     }
 
-    filePathGroup = mainWindow.add("group");
+    pathGroup = mainWindow.add("group");
     {
-        filePathGroup.add("statictext", [0, 0, propertyWidth, height], "Fájl:");
-        var filePathText = filePathGroup.add("statictext", [0, 0, 200, height]);
-        filePathText.justify = "right";
-        var browseButton = filePathGroup.add("button", [0, 0, unitWidth, height], "Tallózás...");
-        {
+        pathLabel = pathGroup.add("statictext", [0, 0, propertyWidth, height], "Path:");
+        pathText = pathGroup.add("statictext", [0, 0, 200, height]);
+        pathText.justify = "right";
+        browseButton = pathGroup.add("button", [0, 0, unitWidth, height], "Tallózás...");
+    }
+
+    function pathModeChanged(mode) {
+        if (mode == FileModes.FILE) {
+            pathLabel.text = mode + ":";
+            pathText.text = selectedFile ? selectedFile.fsName : "";
             browseButton.onClick = function () 
             {
                 var newFile = File.openDialog("Megnyitás", "All files:*.*");
                 if (newFile != null) selectedFile = newFile;
-                filePathText.text = selectedFile.fsName;
+                pathText.text = selectedFile.fsName;
                 $.writeln(selectedFile);
             }
         }
-    }
 
-    folderPathGroup = mainWindow.add("group");
-    {
-        folderPathGroup.add("statictext", [0, 0, propertyWidth, height], "Mappa:");
-        var folderPathText = folderPathGroup.add("statictext", [0, 0, 200, height]);
-        folderPathText.justify = "right";
-        var browseButton = folderPathGroup.add("button", [0, 0, unitWidth, height], "Tallózás...");
-        {
+        else if (mode == FileModes.FOLDER) {
+            pathLabel.text = mode + ":";
+            pathText.text = selectedFolder ? selectedFolder.fsName : "";
             browseButton.onClick = function () 
             {
                 var newFolder = Folder.selectDialog("Válassz mappát");
                 if (newFolder != null) selectedFolder = newFolder;
-                folderPathText.text = selectedFolder.fsName;
+                pathText.text = selectedFolder.fsName;
                 $.writeln(selectedFolder);
             }
         }
     }
 }
 
-
+// initialize
 modeDropdown.onChange();
 mainWindow.show();
