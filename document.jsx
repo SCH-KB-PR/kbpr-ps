@@ -95,7 +95,7 @@ function newDocument() {
 
     var newDocument = app.documents.add(documentWidth, documentHeight, ppi, fileName, NewDocumentMode.RGB);
 
-    var mainLayer = copyAsSmartObject(selectedFile, app.activeDocument, rotate);
+    var mainLayer = copyAsLayer(selectedFile, app.activeDocument, rotate);
 
     var resizePercent = (columnWidth / mainLayer.bounds[2] - mainLayer.bounds[0]) * 100;
     $.writeln("resizePercent: " + resizePercent);
@@ -117,12 +117,8 @@ function newDocument() {
 
 
 
-function copyAsSmartObject(file, target, rotate) {
-    
-    // TODO: for some reason using smart objects uses just about the same amount as the old script
-    // WHICH DOESNT USE SMART OBJECTS
-    // BUT!!! if we use the old method in this script, it uses barely any memory????????????
-    var doc = app.open(file, undefined, false);
+function copyAsLayer(file, target, rotate) {
+    var doc = app.open(file);
 
     if (doc.width > doc.height == rotate) {
         doc.rotateCanvas(90);
