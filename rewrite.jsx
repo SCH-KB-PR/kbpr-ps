@@ -16,14 +16,14 @@ const FileModesArray = getValues(FileModes); // i despise this language
 const RollWidthsArray = [610, 914, 1067];
 
 const PaperSizes = {
-    A0: {name: "A0", width: 1189, height: 841},
-    A1: {name: "A1", width: 841, height: 594},
-    A2: {name: "A2", width: 594, height: 420},
-    A3: {name: "A3", width: 420, height: 297},
-    A4: {name: "A4", width: 297, height: 210},
-    A5: {name: "A5", width: 210, height: 148},
-    A6: {name: "A6", width: 148, height: 105},
-    A7: {name: "A7", width: 105, height: 74},
+    A0: {name: "A0", width: 841, height: 1189},
+    A1: {name: "A1", width: 594, height: 841},
+    A2: {name: "A2", width: 420, height: 594},
+    A3: {name: "A3", width: 297, height: 420},
+    A4: {name: "A4", width: 210, height: 297},
+    A5: {name: "A5", width: 148, height: 210},
+    A6: {name: "A6", width: 105, height: 148},
+    A7: {name: "A7", width: 74, height: 105},
     POSTER: {name: "Nagyplakát", width: NaN, height: NaN}, // invalid
     STICKER: {name: "Körmatrica", width: NaN, height: NaN}, // invalid
     OTHER: {name: "Egyéb", width: NaN, height: NaN} // invalid
