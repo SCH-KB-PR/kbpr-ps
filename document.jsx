@@ -8,8 +8,12 @@ preferences.rulerUnits = Units.MM;
 preferences.typeUnits = TypeUnits.MM;
 
 
-function wasteCheck(docWidth, tileSize) {
-    var width = Math.floor(docWidth / tileSize.width) * tileSize.width;
+function wasteCheck(docWidth, tileSize, gutter) {
+    // theres always one less gutter than tile, they are only inbetween tiles
+    var columns = Math.floor((docWidth + gutter) / (tileSize.width + gutter));
+    var width = columns * (tileSize.width + gutter) - gutter;
+
+    // waste as an area instead of just width
     return (docWidth - width) * tileSize.height;
 }
 
@@ -38,8 +42,8 @@ function preCalcGrid() {
     // fits both ways
     if (paperSize.width < documentWidth && paperSize.height < documentWidth) {
         // check which way causes less waste
-        var wastePortrait = wasteCheck(documentWidth, paperSize);
-        var wasteLandscape = wasteCheck(documentWidth, { width: paperSize.height, height: paperSize.width });
+        var wastePortrait = wasteCheck(documentWidth, paperSize, gutter);
+        var wasteLandscape = wasteCheck(documentWidth, { width: paperSize.height, height: paperSize.width }, gutter);
         rotate = wasteLandscape < wastePortrait;
     }
     else {
@@ -97,10 +101,12 @@ function newDocument() {
     }
 
     var counter = 0;
-    for (var i = 0; i < finalQuantity; i++) {
+    for (var i = 0; i < rowNum; i++) {
         for (var j = 0; j < columnNum; j++) {
+            $.writeln(i * columnNum + j);
             newDocument.artLayers[i * columnNum + j].translate(j * columnWidth, i * rowHeight);
-            if (++counter >= quantity) break;
+            if (++counter >= finalQuantity) break;
+            $.writeln("counter: " + counter);
         }
     }
 
