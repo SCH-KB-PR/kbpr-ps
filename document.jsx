@@ -49,7 +49,7 @@ var correctedQuantity;
 function preCalcGrid() {
     var paperSize = selectedPaperSize;
     // apply margin on both sides
-    documentWidth = selectedRollWidth - margin * 2; // - 10.4; // TODO: ask Gúz
+    documentWidth = selectedRollWidth - margin * 2;
 
     // fits both ways
     if (paperSize.width < documentWidth && paperSize.height < documentWidth) {
@@ -83,7 +83,6 @@ function preCalcGrid() {
     rowNum = Math.ceil(quantity / columnNum);
 
     // total document height
-    // TODO: do we need margin at the top and bottom?
     documentHeight = rowNum * (rowHeight + gutter) - gutter;
 
     // calculate the corrected quantity

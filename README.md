@@ -9,5 +9,5 @@
 ## Ötletek:
 - korrigált mennyiség: töltsük fel az utolsó sort ha van hely még a végén
 - hajtogatható design gyorsabb matrica vágáshoz (papír vastagság!)
-- borderless nyomtatás ad margót de a segédvonalak lap széléig mennek (matrica vágás help)
-- checkbox: bele akarjuk-e venni a margót a dokumentumba?
+- dummy guide
+- aspect ratio link thingy (iconbutton?)

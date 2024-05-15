@@ -28,7 +28,7 @@ const PaperSizes = {
     A5: { name: "A5", width: 148, height: 210 },
     A6: { name: "A6", width: 105, height: 148 },
     A7: { name: "A7", width: 74, height: 105 },
-    POSTER: { name: "Nagyplakát", width: 1000, height: 1000 }, // TODO: invalid
+    POSTER: { name: "Nagyplakát", width: 914, height: 1600 },
     STICKER: { name: "Körmatrica", width: 71, height: 71 },
     OTHER: { name: "Egyéb...", width: 100, height: 100 }
 };
@@ -42,7 +42,7 @@ var selectedRollWidth = RollWidthsArray[0];
 var selectedPaperSize = PaperSizes.A4;
 var quantity = 20;
 var quantityCorrectionEnabled = false;
-var margin = 0;
+var margin = 5;
 var gutter = 2;
 var guide = false;
 
