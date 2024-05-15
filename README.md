@@ -1,4 +1,4 @@
-# KBPR Photoshop Script
+# KBPR Photoshop Script <img src="https://raw.githubusercontent.com/Gilgames32/kbpr-ps/main/misc/kbpr-logo.svg" width="128">
 
 ## Fejlesztést segítő linkek
 - [Hivataols Adobe Photoshop Javascript dokumentáció (2019)](https://github.com/Adobe-CEP/CEP-Resources/blob/master/Documentation/Product%20specific%20Documentation/Photoshop%20Scripting/photoshop-cc-javascript-ref-2019.pdf)
