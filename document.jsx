@@ -52,7 +52,7 @@ function preCalcGrid() {
     documentWidth = selectedRollWidth - margin * 2;
 
     // fits both ways
-    if (paperSize.width < documentWidth && paperSize.height < documentWidth) {
+    if (paperSize.width <= documentWidth && paperSize.height <= documentWidth) {
         // check which way causes less waste
         var wastePortrait = wasteCheck(documentWidth, paperSize, gutter);
         var wasteLandscape = wasteCheck(documentWidth, { width: paperSize.height, height: paperSize.width }, gutter);
@@ -60,15 +60,17 @@ function preCalcGrid() {
     }
     else {
         // only landscape fits
-        if (paperSize.width < documentWidth) {
+        if (paperSize.width <= documentWidth) {
             rotate = false;
         }
         // only portrait fits
-        else if (paperSize.height < documentWidth) {
+        else if (paperSize.height <= documentWidth) {
             rotate = true;
         }
         // neither fits
         else {
+            preCalcInfoKeys.text = "Nem fér el!";
+            preCalcInfoValues.text = "";
             return false;
         }
     }
