@@ -1,4 +1,5 @@
 const ppi = 300;
+// TODO: redundant
 const inchToMm = 25.4;
 const pixelToMm = inchToMm / ppi;
 
@@ -8,15 +9,23 @@ preferences.rulerUnits = Units.MM;
 preferences.typeUnits = TypeUnits.MM;
 
 
-function wasteCheck(docWidth, tileSize, gutter) {
+// calculates the number of columns that can fit the document width
+function columnNumCalc(docWidth, tileSize, gutter) {
     // theres always one less gutter than tile, they are only inbetween tiles
-    var columns = Math.floor((docWidth + gutter) / (tileSize.width + gutter));
+    return Math.floor((docWidth + gutter) / (tileSize.width + gutter));
+}
+
+// calculates the wasted area of the documents side
+// TODO: take gutters into consideration
+function wasteCheck(docWidth, tileSize, gutter) {
+    var columns = columnNumCalc(docWidth, tileSize, gutter);
     var width = columns * (tileSize.width + gutter) - gutter;
 
     // waste as an area instead of just width
     return (docWidth - width) * tileSize.height;
 }
 
+// check if the user had selected a file or a folder
 function dummyCheck() {
     if (selectedMode == FileModes.FILE && selectedFile == null) {
         alert("Nem választottál ki fájlt!");
@@ -30,6 +39,8 @@ function dummyCheck() {
 }
 
 
+// recalculate the grid parameters if a setting has changed to preview the result
+// returns true if it fits
 var documentWidth, documentHeight;
 var rotate;
 var columnNum, rowNum;
@@ -37,7 +48,8 @@ var columnWidth, rowHeight;
 var correctedQuantity;
 function preCalcGrid() {
     var paperSize = selectedPaperSize;
-    documentWidth = selectedRollWidth; // - 10.4; // TODO: ask Gúz
+    // apply margin on both sides
+    documentWidth = selectedRollWidth - margin * 2; // - 10.4; // TODO: ask Gúz
 
     // fits both ways
     if (paperSize.width < documentWidth && paperSize.height < documentWidth) {
@@ -47,75 +59,95 @@ function preCalcGrid() {
         rotate = wasteLandscape < wastePortrait;
     }
     else {
+        // only landscape fits
         if (paperSize.width < documentWidth) {
-            // only landscape fits
             rotate = false;
         }
+        // only portrait fits
         else if (paperSize.height < documentWidth) {
-            // only portrait fits
             rotate = true;
         }
+        // neither fits
         else {
-            // neither fits
             return false;
         }
     }
 
+    // dimensions of the tiles
+    // TODO: cleanup 
     columnWidth = rotate ? paperSize.height : paperSize.width;
-    columnNum = Math.floor(documentWidth / columnWidth);
-
-    rowNum = Math.ceil(quantity / columnNum);
     rowHeight = rotate ? paperSize.width : paperSize.height;
 
-    documentHeight = rowNum * rowHeight;
+    // number of columns and rows
+    columnNum = columnNumCalc(documentWidth, { width: columnWidth, height: rowHeight }, gutter);
+    rowNum = Math.ceil(quantity / columnNum);
+
+    // total document height
+    // TODO: do we need margin at the top and bottom?
+    documentHeight = rowNum * (rowHeight + gutter) - gutter;
+
+    // calculate the corrected quantity
     correctedQuantity = columnNum * rowNum;
 
 
     // update ui
     correctedQuantityText.text = correctedQuantity + " db";
+    // TODO: show more info in a panel
 
     return true;
 }
 
-function newDocument() {
+
+// creates the canvas and places the images
+// returns true if the operation was successful
+function create() {
+    // checks
+    if (selectedMode == FileModes.FOLDER) {
+        alert("Nem implementált funkció!")
+    }
+
     if (!dummyCheck()) return false;
+
     if (!preCalcGrid()) {
         alert("Nem fér el a kiválasztott méretű papíron!");
         return false;
     }
 
+    // finalize quanitity
+    const finalQuantity = quantityCorrectionEnabled ? correctedQuantity : quantity;
+
+    // create canvas in ps
     var newDocument = app.documents.add(documentWidth, documentHeight, ppi, fileName, NewDocumentMode.RGB);
 
-    var mainLayer = copyAsLayer(selectedFile, app.activeDocument, rotate);
+    // open the file
+    var mainLayer = openAsLayer(selectedFile, app.activeDocument, rotate);
 
+    // resize the layer
     var resizePercent = (columnWidth / mainLayer.bounds[2] - mainLayer.bounds[0]) * 100;
-    $.writeln("resizePercent: " + resizePercent);
-    $.writeln("bounds: " + mainLayer.bounds);
-    
     mainLayer.resize(resizePercent, resizePercent, AnchorPosition.TOPLEFT);
 
-    var finalQuantity = quantityCorrectionEnabled ? correctedQuantity : quantity;
-
+    // duplicate the layer to match quanity
     for (var i = 0; i < finalQuantity - 1; i++) {
         mainLayer.duplicate(newDocument);
     }
 
+    // arrange the layers
     var counter = 0;
     for (var i = 0; i < rowNum; i++) {
         for (var j = 0; j < columnNum; j++) {
-            $.writeln(i * columnNum + j);
-            newDocument.artLayers[i * columnNum + j].translate(j * columnWidth, i * rowHeight);
+            newDocument.artLayers[i * columnNum + j].translate(j * (columnWidth + gutter), i * (rowHeight + gutter));
             if (++counter >= finalQuantity) break;
-            $.writeln("counter: " + counter);
         }
     }
+
+    // TODO: merge the two fors
 
     return true;
 }
 
 
-
-function copyAsLayer(file, target, rotate) {
+// opens the file as a layer to the target document
+function openAsLayer(file, target, rotate) {
     var doc = app.open(file);
 
     if (rotate != doc.width > doc.height) {

@@ -39,7 +39,7 @@ var selectedPaperSize = PaperSizes.A4;
 var quantity = 20;
 var quantityCorrectionEnabled = false;
 var margin = 0;
-var gutter = 0;
+var gutter = 2;
 var guide = false;
 
 var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, { closeButton: true });
@@ -80,7 +80,7 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
                 pathText.text = selectedFile ? selectedFile.fsName : "";
                 pathBrowseButton.onClick = function () {
                     var newFile = File.openDialog("Megnyitás", "All files:*.*");
-                    if (newFile != null){
+                    if (newFile != null) {
                         selectedFile = newFile;
                         if (selectedPaperSize == PaperSizes.OTHER) {
                             calcAspectRatio(selectedFile);
@@ -206,6 +206,7 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
                 margin = parseHuFloat(marginField.text);
                 if (isNaN(margin) || margin < 0) margin = 0;
                 marginField.text = margin;
+                preCalcGrid();
             }
         }
 
@@ -219,6 +220,7 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
                 gutter = parseHuFloat(gutterField.text);
                 if (isNaN(gutter) || gutter < 0) gutter = 0;
                 gutterField.text = gutter;
+                preCalcGrid();
             }
         }
 
@@ -241,7 +243,7 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
         submitGroup.alignment = "center";
         var submitButton = submitGroup.add("button", boundsGen(100), "OK");
         submitButton.onClick = function () {
-            if (newDocument()) mainWindow.close();
+            if (create()) mainWindow.close();
         }
 
         var cancelButton = submitGroup.add("button", boundsGen(100), "Mégse");
