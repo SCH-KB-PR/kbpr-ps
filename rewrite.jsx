@@ -1,9 +1,12 @@
 #target "photoshop"
 #include "document.jsx"
 
-const propertyWidth = 130;
-const dataWidth = 100;
-const unitWidth = 70;
+const propertyWidth = 125;
+const dataWidth = 75;
+const shortDataWidth = 50;
+const unitWidth = 35;
+const miscWidth = 10;
+const defaultPaddingWidth = 5;
 const height = 20;
 
 
@@ -14,6 +17,7 @@ const FileModes = {
 const FileModesArray = getValues(FileModes); // i despise this language
 
 const RollWidthsArray = [610, 914, 1067];
+// TODO: default margin by roll width, maybe .enabled = false;
 
 const PaperSizes = {
     A0: { name: "A0", width: 841, height: 1189 },
@@ -24,9 +28,9 @@ const PaperSizes = {
     A5: { name: "A5", width: 148, height: 210 },
     A6: { name: "A6", width: 105, height: 148 },
     A7: { name: "A7", width: 74, height: 105 },
-    POSTER: { name: "Nagyplakát", width: 1000, height: 1000 }, // invalid
-    STICKER: { name: "Körmatrica", width: 71, height: 71 }, // invalid
-    OTHER: { name: "Egyéb...", width: 100, height: 100 } // invalid
+    POSTER: { name: "Nagyplakát", width: 1000, height: 1000 }, // TODO: invalid
+    STICKER: { name: "Körmatrica", width: 71, height: 71 },
+    OTHER: { name: "Egyéb...", width: 100, height: 100 }
 };
 const PaperSizesArray = getValues(PaperSizes);
 
@@ -49,12 +53,11 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
     var modePanel = mainWindow.add("panel");
     {
         modePanel.alignChildren = "fill";
+
+        // mode selection 
         var modeSelectGroup = modePanel.add("group");
         {
-            // label
             modeSelectGroup.add("statictext", boundsGen(propertyWidth), "Mód:");
-
-            // field
             var modeDropdown = modeSelectGroup.add("dropdownlist", boundsGen(dataWidth));
             for (var mode in FileModes) modeDropdown.add("item", FileModes[mode]);
             modeDropdown.selection = 0;
@@ -64,17 +67,20 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
             }
         }
 
+        // path selection
         var pathGroup = modePanel.add("group");
         {
             var pathLabel = pathGroup.add("statictext", boundsGen(propertyWidth), "Path:");
-            var pathText = pathGroup.add("statictext", [0, 0, 200, height]);
+            var pathText = pathGroup.add("statictext", boundsGen(propertyWidth + dataWidth + dataWidth));
             pathText.justify = "right";
             var pathBrowseButton = pathGroup.add("button", boundsGen(unitWidth), "Tallózás...");
         }
 
+        // handling mode changes and setting up the path selection
         function pathModeChanged(selection) {
             selectedMode = FileModesArray[selection.index];
 
+            // file
             if (selectedMode == FileModes.FILE) {
                 pathLabel.text = selectedMode + ":";
                 pathText.text = selectedFile ? selectedFile.fsName : "";
@@ -91,6 +97,7 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
                 }
             }
 
+            // folder
             else if (selectedMode == FileModes.FOLDER) {
                 pathLabel.text = selectedMode + ":";
                 pathText.text = selectedFolder ? selectedFolder.fsName : "";
@@ -103,10 +110,11 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
         }
     }
 
-
     var paperPanel = mainWindow.add("panel", undefined, "Papírbeállítások");
     {
         paperPanel.alignChildren = "fill";
+
+        // roll width and margin
         var rollWidthGroup = paperPanel.add("group");
         {
             rollWidthGroup.add("statictext", boundsGen(propertyWidth), "Papírhenger szélesség:");
@@ -117,8 +125,20 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
                 selectedRollWidth = RollWidthsArray[rollWidthDropdown.selection.index];
                 preCalcGrid();
             }
+
+            rollWidthGroup.add("statictext", boundsGen(dataWidth), "Margó:");
+            var marginField = rollWidthGroup.add("edittext", boundsGen(dataWidth), margin);
+            var marginUnit = rollWidthGroup.add("statictext", boundsGen(unitWidth), "mm");
+            marginField.onChange = function () {
+                margin = parseHuFloat(marginField.text);
+                if (isNaN(margin) || margin < 0) margin = 0;
+                marginField.text = margin;
+                preCalcGrid();
+            }
+
         }
 
+        // paper (tile) size
         var paperSizeGroup = paperPanel.add("group");
         {
             paperSizeGroup.add("statictext", boundsGen(propertyWidth), "Papírméret:");
@@ -135,13 +155,14 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
             }
         }
 
+        // custom paper size
         var paperInfoGroup = paperPanel.add("group");
         {
             paperInfoGroup.orientation = "row";
-            paperInfoGroup.add("statictext", boundsGen(propertyWidth), "");
-            var paperSizeWidth = paperInfoGroup.add("edittext", boundsGen(50), selectedPaperSize.width);
-            paperInfoGroup.add("statictext", boundsGen(10), "\u00D7"); // ×
-            var paperSizeHeight = paperInfoGroup.add("edittext", boundsGen(50), selectedPaperSize.height);
+            paperInfoGroup.add("statictext", boundsGen(propertyWidth + dataWidth - (2 * shortDataWidth + miscWidth + 4 * defaultPaddingWidth)));
+            var paperSizeWidth = paperInfoGroup.add("edittext", boundsGen(shortDataWidth), selectedPaperSize.width);
+            paperInfoGroup.add("statictext", boundsGen(miscWidth), "\u00D7"); // ×
+            var paperSizeHeight = paperInfoGroup.add("edittext", boundsGen(shortDataWidth), selectedPaperSize.height);
             paperInfoGroup.add("statictext", boundsGen(unitWidth), "mm");
 
             paperSizeWidth.enabled = paperSizeHeight.enabled = false;
@@ -167,7 +188,7 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
 
     }
 
-
+    // quantity and correction
     var quantityPanel = mainWindow.add("panel");
     {
         quantityPanel.orientation = "row";
@@ -175,9 +196,9 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
         var quantityField = quantityPanel.add("edittext", boundsGen(dataWidth), quantity);
         var quantityUnit = quantityPanel.add("statictext", boundsGen(unitWidth), "db");
 
-        quantityPanel.add("statictext", boundsGen(50), "Korrigálás");
-        var correctedQuantityCheckbox = quantityPanel.add("checkbox");
-        var correctedQuantityText = quantityPanel.add("statictext", boundsGen(dataWidth), quantity + " db");
+        quantityPanel.add("statictext", boundsGen(dataWidth), "Korrigálás:");
+        var correctedQuantityCheckbox = quantityPanel.add("checkbox", boundsGen(miscWidth));
+        var correctedQuantityText = quantityPanel.add("statictext", boundsGen(unitWidth), quantity + " db");
         correctedQuantityText.enabled = quantityCorrectionEnabled;
 
         quantityField.onChange = function () {
@@ -193,57 +214,76 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
         }
     }
 
+    // gutter and guide
     var layoutPanel = mainWindow.add("panel", undefined, "Elrendezés");
     {
         layoutPanel.alignChildren = "fill";
+        layoutPanel.orientation = "row";
 
-        var marginGroup = layoutPanel.add("group");
+        var layoutSettingsGroup = layoutPanel.add("group");
         {
-            marginGroup.add("statictext", boundsGen(propertyWidth), "Margó:");
-            var marginField = marginGroup.add("edittext", boundsGen(dataWidth), margin);
-            var marginUnit = marginGroup.add("statictext", boundsGen(unitWidth), "mm");
-            marginField.onChange = function () {
-                margin = parseHuFloat(marginField.text);
-                if (isNaN(margin) || margin < 0) margin = 0;
-                marginField.text = margin;
-                preCalcGrid();
+            layoutSettingsGroup.alignChildren = "fill";
+            layoutSettingsGroup.orientation = "column";
+            var gutterGroup = layoutSettingsGroup.add("group");
+            {
+                gutterGroup.add("statictext", boundsGen(propertyWidth), "Köz:");
+                var gutterField = gutterGroup.add("edittext", boundsGen(dataWidth), gutter);
+                var gutterUnit = gutterGroup.add("statictext", boundsGen(unitWidth), "mm");
+                gutterField.onChange = function () {
+                    gutter = parseHuFloat(gutterField.text);
+                    if (isNaN(gutter) || gutter < 0) gutter = 0;
+                    gutterField.text = gutter;
+                    preCalcGrid();
+                }
+            }
+
+            var guideGroup = layoutSettingsGroup.add("group");
+            {
+                guideGroup.add("statictext", boundsGen(propertyWidth), "Segédvonalak:");
+                var guideCheckbox = guideGroup.add("checkbox", boundsGen(dataWidth));
+                guideCheckbox.value = guide;
+                guideCheckbox.onClick = function () {
+                    guide = guideCheckbox.value;
+                }
             }
         }
 
-
-        var gutterGroup = layoutPanel.add("group");
+        var preCalcInfoGroup = layoutPanel.add("group");
         {
-            gutterGroup.add("statictext", boundsGen(propertyWidth), "Köz:");
-            var gutterField = gutterGroup.add("edittext", boundsGen(dataWidth), gutter);
-            var gutterUnit = gutterGroup.add("statictext", boundsGen(unitWidth), "mm");
-            gutterField.onChange = function () {
-                gutter = parseHuFloat(gutterField.text);
-                if (isNaN(gutter) || gutter < 0) gutter = 0;
-                gutterField.text = gutter;
-                preCalcGrid();
-            }
-        }
-
-
-        var guideGroup = layoutPanel.add("group");
-        {
-            guideGroup.add("statictext", boundsGen(propertyWidth), "Segédvonalak:");
-            var guideCheckbox = guideGroup.add("checkbox", boundsGen(dataWidth));
-            guideCheckbox.value = guide;
-            guideCheckbox.onClick = function () {
-                guide = guideCheckbox.value;
-            }
+            preCalcInfoGroup.orientation = "row"
+            var preCalcInfoKeys = preCalcInfoGroup.add("statictext", [0, 0, dataWidth, height * 3], "asd", { multiline: true });
+            preCalcInfoKeys.justify = "right";
+            preCalcInfoKeys.enabled = false;
+            var preCalcInfoValues = preCalcInfoGroup.add("statictext", [0, 0, propertyWidth, height * 3], "asd", { multiline: true });
+            preCalcInfoValues.enabled = false;
         }
 
     }
 
-
+    // bottom buttons
     var submitGroup = mainWindow.add("group");
     {
         submitGroup.alignment = "center";
         var submitButton = submitGroup.add("button", boundsGen(100), "OK");
         submitButton.onClick = function () {
             if (create()) mainWindow.close();
+        }
+
+        var feedbackButton = submitGroup.add("button", boundsGen(100), "Hibajelzés");
+        feedbackButton.onClick = function () {
+            var url = "https://github.com/Gilgames32/kbpr-ps/issues/new";
+            try {
+                // windows
+                app.system("start " + url);
+            } catch (error) {
+                try {
+                    // mac
+                    app.system("open " + url);
+                } catch (error) {
+                    // just in case
+                    alert("Jelezd a hibákat itt: " + url);
+                }
+            }
         }
 
         var cancelButton = submitGroup.add("button", boundsGen(100), "Mégse");

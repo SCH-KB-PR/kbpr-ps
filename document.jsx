@@ -92,7 +92,18 @@ function preCalcGrid() {
 
     // update ui
     correctedQuantityText.text = correctedQuantity + " db";
-    // TODO: show more info in a panel
+    preCalcInfoKeys.text = 
+        "Forgatás:\n" +
+        "Rács:\n" + 
+        "Rácsméret:\n" +
+        "Dokumentum:";
+    preCalcInfoValues.text =
+        (rotate ? "Igen" : "Nem") + "\n" +
+        columnNum + " \u00D7 " + rowNum + " db\n" +
+        columnWidth + " \u00D7 " + rowHeight + " mm\n" +
+        documentWidth + " \u00D7 " + documentHeight + " mm";
+
+    // this is a terrible way of doing this
 
     return true;
 }
