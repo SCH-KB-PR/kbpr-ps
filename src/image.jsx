@@ -1,10 +1,16 @@
 // image constants
 const ppi = 300;
 const inchToMm = 25.4;
-const pixelToMm = inchToMm / ppi;
+const mmToPixel = ppi / inchToMm;
+const mmToPoint = mmToPixel * 72 / ppi; // at 72 ppi 1px = 1pt
 
 preferences.rulerUnits = Units.MM;
 preferences.typeUnits = TypeUnits.MM;
+
+// convert mm to pt
+function mmToPt(mm) {
+    return mm * mmToPoint;
+}
 
 
 // calculates the number of columns that can fit the document width
@@ -91,9 +97,9 @@ function preCalcGrid() {
 
     // update ui
     correctedQuantityText.text = correctedQuantity + " db";
-    preCalcInfoKeys.text = 
+    preCalcInfoKeys.text =
         "Forgatás:\n" +
-        "Rács:\n" + 
+        "Rács:\n" +
         "Rácsméret:\n" +
         "Dokumentum:";
     preCalcInfoValues.text =
@@ -127,32 +133,99 @@ function createImage() {
     const finalQuantity = quantityCorrectionEnabled ? correctedQuantity : quantity;
 
     // create canvas in ps
-    var newDocument = app.documents.add(documentWidth, documentHeight, ppi, fileName, NewDocumentMode.RGB);
+    var doc = app.documents.add(documentWidth, documentHeight, ppi, fileName, NewDocumentMode.RGB);
 
     // open the file
     var mainLayer = openAsLayer(selectedFile, app.activeDocument, rotate);
+    mainLayer.name = "Image";
 
     // resize the layer
+    // TODO: stretch if needed
     var resizePercent = (columnWidth / mainLayer.bounds[2] - mainLayer.bounds[0]) * 100;
     mainLayer.resize(resizePercent, resizePercent, AnchorPosition.TOPLEFT);
 
     // duplicate the layer to match quanity
     for (var i = 0; i < finalQuantity - 1; i++) {
-        mainLayer.duplicate(newDocument);
+        mainLayer.duplicate(doc);
     }
 
     // arrange the layers
     var counter = 0;
     for (var i = 0; i < rowNum; i++) {
         for (var j = 0; j < columnNum; j++) {
-            newDocument.artLayers[i * columnNum + j].translate(j * (columnWidth + gutter), i * (rowHeight + gutter));
-            if (++counter >= finalQuantity) break;
+            doc.artLayers[i * columnNum + j].translate(j * (columnWidth + gutter), i * (rowHeight + gutter));
+            if (++counter >= finalQuantity) break; // if we are not filling the final row
         }
     }
 
-    // TODO: merge the two fors
+    if (guide) {
+        createGuides(doc)
+    }
 
     return true;
+}
+
+// creates the guides on the borders of the tiles
+function createGuides(doc) {
+    // new layer at the top
+    var guideLayer = doc.artLayers.add();
+    guideLayer.name = "Guides";
+    guideLayer.move(doc, ElementPlacement.PLACEATBEGINNING);
+    doc.activeLayer = guideLayer;
+
+    // set color
+    app.foregroundColor.rgb.red = 0;
+    app.foregroundColor.rgb.green = 0;
+    app.foregroundColor.rgb.blue = 0;
+    // TODO: !!! we have to manually set the pencil size to 1px !!!
+
+    // we have to convert the units to points
+    var documentWidthPt = mmToPt(documentWidth);
+    var documentHeightPt = mmToPt(documentHeight);
+    var columnWidthPt = mmToPt(columnWidth);
+    var rowHeightPt = mmToPt(rowHeight);
+    var gutterPt = mmToPt(gutter);
+
+    lines = new Array();
+
+    // vertical lines
+    for (var i = 0; i < columnNum; i++) {
+        var pre = i * (columnWidthPt + gutterPt);
+        var post = pre + columnWidthPt;
+        lines.push(createLineSubPath([pre, 0], [pre, documentHeightPt]));
+        lines.push(createLineSubPath([post, 0], [post, documentHeightPt]));
+    }
+
+    // horizontal lines
+    for (var i = 0; i < rowNum; i++) {
+        var pre = i * (rowHeightPt + gutterPt);
+        var post = pre + rowHeightPt;
+        lines.push(createLineSubPath([0, pre], [documentWidthPt, pre]));
+        lines.push(createLineSubPath([0, post], [documentWidthPt, post]));
+    }
+
+    // rasterize the path
+    var path = doc.pathItems.add("Line", lines);
+    path.strokePath(ToolType.PENCIL);
+    path.remove();
+}
+
+// creates a line subpath from c1 to c2
+function createLineSubPath(c1, c2) {
+    var p1 = new PathPointInfo();
+    p1.anchor = p1.leftDirection = p1.rightDirection = c1;
+
+    var p2 = new PathPointInfo();
+    p2.anchor = p2.leftDirection = p2.rightDirection = c2;
+
+    p1.kind = p2.kind = PointKind.CORNERPOINT;
+
+    var spi = new SubPathInfo();
+    spi.closed = false;
+    spi.operation = ShapeOperation.SHAPEADD;
+    spi.entireSubPath = [p1, p2];
+
+    return spi;
 }
 
 

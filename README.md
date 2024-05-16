@@ -8,8 +8,10 @@
 
 ## TODO/ötletek:
 - hajtogatható design gyorsabb matrica vágáshoz (papír vastagság!)
-- dummy guide
+- dummy guide és tooltippek
 - kitűző preset
-- matrica és kitűzők kör alakúra vágása
+- matrica és kitűzők kör alakúra vágása -> circlemask checkbox
 - segédvonalak
-- méretre nyújtás ha nem stimmel a képarány
+- méretre nyújtás ha nem stimmel a képarány -> rotatesource checkbox
+- mappa funkció -> minden nyújtva lesz amúgy is
+- fejlesztői guide?
