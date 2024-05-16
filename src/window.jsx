@@ -8,7 +8,7 @@ const miscWidth = 10;
 const longDataWidth = dataWidth + defaultMarginWidth + unitWidth;
 const buttonWidth = 100;
 
-var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, { closeButton: true });
+var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, { closeButton: true });
 {
     mainWindow.alignChildren = "fill";
 
@@ -19,58 +19,59 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
         // mode selection 
         var modeSelectGroup = modePanel.add("group");
         {
-            modeSelectGroup.add("statictext", boundsGen(propertyWidth), "Mód:").justify = "right";
-            var modeDropdown = modeSelectGroup.add("dropdownlist", boundsGen(longDataWidth));
-            for (var mode in FileModes) modeDropdown.add("item", FileModes[mode]);
-            modeDropdown.selection = 0;
+            modeSelectGroup.add("statictext", boundsGen(propertyWidth), "Több fájl:").justify = "right";
+            var modeCheckbox = modeSelectGroup.add("checkbox");
 
-            modeDropdown.onChange = function () {
-                pathModeChanged(modeDropdown.selection);
+            modeCheckbox.onClick = function () {
+                multiFileMode = modeCheckbox.value;
+                pathLabel.text = multiFileMode ? "Mappa:" : "Fájl:";
+                pathText.text = multiFileMode ? (selectedFolder ? selectedFolder.fsName : "") : (selectedFile ? selectedFile.fsName : "");
+                selectedFileList = multiFileMode ? (selectedFolder != null ? selectedFolder.getFiles() : [null]) : [selectedFile];
+                quantityTypeLabel.text = multiFileMode ? "Szorzó:" : "Mennyiség:";
+                quantityUnit.text = multiFileMode ? "x" : "db";
+                
+                preCalcGrid();
             }
         }
 
         // path selection
         var pathGroup = modePanel.add("group");
         {
-            var pathLabel = pathGroup.add("statictext", boundsGen(propertyWidth), "Elérési út:");
+            var pathLabel = pathGroup.add("statictext", boundsGen(propertyWidth), "Fájl:");
             pathLabel.justify = "right";
             var pathText = pathGroup.add("statictext", boundsGen(longDataWidth + defaultMarginWidth + propertyWidth + defaultMarginWidth + unitWidth));
             pathText.justify = "right";
             var pathBrowseButton = pathGroup.add("button", boundsGen(unitWidth), "Tallózás...");
-        }
 
-        // handling mode changes and setting up the path selection
-        function pathModeChanged(selection) {
-            selectedMode = FileModesArray[selection.index];
-
-            // file
-            if (selectedMode == FileModes.FILE) {
-                pathLabel.text = selectedMode + ":";
-                pathText.text = selectedFile ? selectedFile.fsName : "";
-                pathBrowseButton.onClick = function () {
+            pathBrowseButton.onClick = function (){
+                // folder
+                if (multiFileMode) {
+                    var newFolder = Folder.selectDialog("Válassz mappát");
+                    if (newFolder != null) {
+                        selectedFolder = newFolder;
+                        selectedFileList = selectedFolder.getFiles();
+                        if (selectedPaperSize == PaperSizes.OTHER) {
+                            calcAspectRatio(selectedFileList[0]);
+                        }
+                        preCalcGrid();
+                    }
+                    pathText.text = selectedFolder ? (selectedFolder.fsName + " (" + selectedFileList.length + " fájl)") : "";
+                }
+                // file
+                else {
                     var newFile = File.openDialog("Megnyitás", "All files:*.*");
                     if (newFile != null) {
                         selectedFile = newFile;
+                        selectedFileList = [selectedFile];
                         if (selectedPaperSize == PaperSizes.OTHER) {
                             calcAspectRatio(selectedFile);
                         }
+                        preCalcGrid();
                     }
                     pathText.text = selectedFile ? selectedFile.fsName : "";
                 }
             }
-
-            // folder
-            else if (selectedMode == FileModes.FOLDER) {
-                pathLabel.text = selectedMode + ":";
-                pathText.text = selectedFolder ? selectedFolder.fsName : "";
-                pathBrowseButton.onClick = function () {
-                    var newFolder = Folder.selectDialog("Válassz mappát");
-                    if (newFolder != null) selectedFolder = newFolder;
-                    pathText.text = selectedFolder ? selectedFolder.fsName : "";
-                }
-            }
         }
-        modeDropdown.onChange();
     }
 
     var paperPanel = mainWindow.add("panel", undefined, "Papír");
@@ -115,8 +116,13 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
                     // aspect ratio calculation
                     if (selectedFile != null && selectedPaperSize == PaperSizes.OTHER) calcAspectRatio(selectedFile);
 
+                    // TODO: pusztító switch case xddd
+
                     // nagyplakát preset
                     if (selectedPaperSize == PaperSizes.POSTER) {
+                        modeDropdown.selection = 0;
+                        modeSelectGroup.enabled = false;
+
                         rollWidthGroup.enabled = false;
                         rollWidthDropdown.selection = 1;    // 914
 
@@ -124,7 +130,7 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
                         marginField.text = margin = 0;
 
                         quantityPanel.enabled = false;
-                        quantityField.text = quantity = 1;
+                        quantityField.text = quantityMultiplier = 1;
                         correctedQuantityCheckbox.value = quantityCorrectionEnabled = false;
 
                         layoutPanel.enabled = false;
@@ -132,6 +138,7 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
                         guideCheckbox.value = guide = false;
                     }
                     else {
+                        modeSelectGroup.enabled = true;
                         rollWidthGroup.enabled = true;
                         paperDetailsGroup.enabled = true;
                         quantityPanel.enabled = true;
@@ -165,7 +172,7 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
             {
                 rollMarginGroup.add("statictext", boundsGen(propertyWidth), "Margó:").justify = "right";
                 var marginField = rollMarginGroup.add("edittext", boundsGen(dataWidth), margin);
-                var marginUnit = rollMarginGroup.add("statictext", boundsGen(unitWidth), "mm");
+                rollMarginGroup.add("statictext", boundsGen(unitWidth), "mm");
                 marginField.onChange = function () {
                     margin = parseHuFloat(marginField.text);
                     if (isNaN(margin) || margin < 0) margin = 0;
@@ -229,25 +236,28 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
     var quantityPanel = mainWindow.add("panel", undefined, "Mennyiség");
     {
         quantityPanel.orientation = "row";
-        quantityPanel.add("statictext", boundsGen(propertyWidth), "Mennyiség:").justify = "right";
-        var quantityField = quantityPanel.add("edittext", boundsGen(dataWidth), quantity);
+
+        var quantityTypeLabel = quantityPanel.add("statictext", boundsGen(propertyWidth), "Mennyiség:");
+        quantityTypeLabel.justify = "right";
+        var quantityField = quantityPanel.add("edittext", boundsGen(dataWidth), quantityMultiplier);
         var quantityUnit = quantityPanel.add("statictext", boundsGen(unitWidth), "db");
 
         quantityPanel.add("statictext", boundsGen(propertyWidth), "Korrigálás:").justify = "right";
         var correctedQuantityCheckbox = quantityPanel.add("checkbox", boundsGen(miscWidth));
-        var correctedQuantityText = quantityPanel.add("statictext", boundsGen(unitWidth), quantity + " db");
+        var correctedQuantityText = quantityPanel.add("statictext", boundsGen(unitWidth), correctedQuantity + " db");
         correctedQuantityText.enabled = quantityCorrectionEnabled;
 
         quantityField.onChange = function () {
-            quantity = parseInt(quantityField.text);
-            if (isNaN(quantity) || quantity < 1) quantity = 1;
-            quantityField.text = quantity;
+            quantityMultiplier = parseInt(quantityField.text);
+            if (isNaN(quantityMultiplier) || quantityMultiplier < 1) quantityMultiplier = 1;
+            quantityField.text = quantityMultiplier;
 
             preCalcGrid();
         }
 
         correctedQuantityCheckbox.onClick = function () {
             correctedQuantityText.enabled = quantityCorrectionEnabled = correctedQuantityCheckbox.value;
+            preCalcGrid();
         }
     }
 
@@ -267,7 +277,7 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
             {
                 gutterGroup.add("statictext", boundsGen(propertyWidth), "Köz:").justify = "right";
                 var gutterField = gutterGroup.add("edittext", boundsGen(dataWidth), gutter);
-                var gutterUnit = gutterGroup.add("statictext", boundsGen(unitWidth), "mm");
+                gutterUnit = gutterGroup.add("statictext", boundsGen(unitWidth), "mm");
                 gutterField.onChange = function () {
                     gutter = parseHuFloat(gutterField.text);
                     if (isNaN(gutter) || gutter < 0) gutter = 0;
@@ -304,10 +314,10 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
         var preCalcInfoGroup = layoutPanel.add("group");
         {
             preCalcInfoGroup.orientation = "row"
-            var preCalcInfoKeys = preCalcInfoGroup.add("statictext", boundsGen(propertyWidth, uicHeight * 3), ":3", { multiline: true });
+            var preCalcInfoKeys = preCalcInfoGroup.add("statictext", boundsGen(propertyWidth, uicHeight * 4), "", { multiline: true });
             preCalcInfoKeys.justify = "right";
             preCalcInfoKeys.enabled = false;
-            var preCalcInfoValues = preCalcInfoGroup.add("statictext", boundsGen(longDataWidth, uicHeight * 3), ":3", { multiline: true });
+            var preCalcInfoValues = preCalcInfoGroup.add("statictext", boundsGen(longDataWidth, uicHeight * 4), ":3", { multiline: true });
             preCalcInfoValues.enabled = false;
         }
 
@@ -371,5 +381,5 @@ function calcAspectRatio(file) {
     var doc = app.open(file);
     selectedFileAspect = doc.width / doc.height;
     doc.close(SaveOptions.DONOTSAVECHANGES);
-    paperSizeWidth.onChange();
+    paperSizeWidth.notify();
 }

@@ -31,11 +31,11 @@ function wasteCheck(docWidth, tileSize, gutter) {
 
 // check if the user had selected a file or a folder
 function dummyCheck() {
-    if (selectedMode == FileModes.FILE && selectedFile == null) {
+    if (!multiFileMode && selectedFile == null) {
         alert("Nem választottál ki fájlt!");
         return false;
     }
-    if (selectedMode == FileModes.FOLDER && selectedFolder == null) {
+    if (multiFileMode && selectedFolder == null) {
         alert("Nem választottál ki mappát!");
         return false;
     }
@@ -50,8 +50,11 @@ var wasteMargin;
 var rotate;
 var columnNum, rowNum;
 var columnWidth, rowHeight;
-var correctedQuantity;
+var actualQuantity, correctedQuantity = quantityMultiplier;
 function preCalcGrid() {
+    // actual quantity correction
+    actualQuantity = quantityMultiplier * selectedFileList.length;
+
     var paperSize = selectedPaperSize;
     // apply margin on both sides
     documentWidth = selectedRollWidth - margin * 2;
@@ -87,7 +90,7 @@ function preCalcGrid() {
 
     // number of columns and rows
     columnNum = columnNumCalc(documentWidth, { width: columnWidth, height: rowHeight }, gutter);
-    rowNum = Math.ceil(quantity / columnNum);
+    rowNum = Math.ceil(actualQuantity / columnNum);
 
     // total document height
     documentHeight = rowNum * (rowHeight + gutter) - gutter;
@@ -102,13 +105,15 @@ function preCalcGrid() {
     // update ui
     correctedQuantityText.text = correctedQuantity + " db";
     preCalcInfoKeys.text =
+        "Darabszám:\n" +
         "Forgatás:\n" +
         "Rács:\n" +
         "Rácsméret:\n" +
         "Dokumentum:";
     preCalcInfoValues.text =
+        (quantityCorrectionEnabled ? correctedQuantity : actualQuantity) + "\n" +
         (rotate ? "Igen" : "Nem") + "\n" +
-        columnNum + " \u00D7 " + rowNum + " db\n" +
+        columnNum + " \u00D7 " + rowNum + "\n" +
         Math.round(columnWidth) + " \u00D7 " + Math.round(rowHeight) + " mm\n" +
         Math.round(documentWidth) + " \u00D7 " + Math.round(documentHeight) + " mm";
 
@@ -122,10 +127,6 @@ function preCalcGrid() {
 // returns true if the operation was successful
 function createImage() {
     // checks
-    if (selectedMode == FileModes.FOLDER) {
-        alert("Nem implementált funkció!")
-    }
-
     if (!dummyCheck()) return false;
 
     if (!preCalcGrid()) {
@@ -134,34 +135,43 @@ function createImage() {
     }
 
     // finalize quanitity
-    const finalQuantity = quantityCorrectionEnabled ? correctedQuantity : quantity;
+    const finalQuantity = quantityCorrectionEnabled ? correctedQuantity : actualQuantity;
 
     // create canvas in ps
     var doc = app.documents.add(documentWidth, documentHeight, ppi, fileName, NewDocumentMode.RGB);
 
-    // open the file
-    var mainLayer = openAsLayer(selectedFile, doc, rotate);
-    mainLayer.name = "Image";
+    // open the files
+    var sourceLayers = new Array();
+    for (var i = 0; i < selectedFileList.length; i++) {
+        var layer = openAsLayer(selectedFileList[i], doc, rotate);
+        layer.name = "Image " + (i + 1);
+        sourceLayers.push(layer);
+    }
 
-    // resize the layer
-    var resizeWidthPercent = (columnWidth / mainLayer.bounds[2] - mainLayer.bounds[0]) * 100;
-    var resizeHeightPercent = (rowHeight / mainLayer.bounds[3] - mainLayer.bounds[1]) * 100;
-    mainLayer.resize(resizeWidthPercent, resizeHeightPercent, AnchorPosition.TOPLEFT);
+    // resize the layers
+    for (var i = 0; i < sourceLayers.length; i++) {
+        layer.translate(-layer.bounds[0], -layer.bounds[1]); // this breaks transparent pngs, too bad
+        var layer = sourceLayers[i];
+        var resizeWidthPercent = (columnWidth / (layer.bounds[2] - layer.bounds[0])) * 100;
+        var resizeHeightPercent = (rowHeight / (layer.bounds[3] - layer.bounds[1])) * 100;
+        layer.resize(resizeWidthPercent, resizeHeightPercent, AnchorPosition.TOPLEFT);
+    }
 
     // apply mask if needed
     if (circleMask) {
-        createCircleMask(doc, mainLayer);
+        createCircleMask(doc, sourceLayers);
     }
 
     // duplicate the layer to match quanity
-    for (var i = 0; i < finalQuantity - 1; i++) {
-        mainLayer.duplicate(doc);
+    for (var i = 0; i < finalQuantity - sourceLayers.length; i++) {
+        sourceLayers[i % sourceLayers.length].duplicate(doc);
     }
 
     // arrange the layers
     var counter = 0;
     for (var i = 0; i < rowNum; i++) {
         for (var j = 0; j < columnNum; j++) {
+            // TODO: dont use doc.artLayers, have it stored elsewhere
             doc.artLayers[i * columnNum + j].translate(wasteMargin + j * (columnWidth + gutter), i * (rowHeight + gutter));
             if (++counter >= finalQuantity) break; // if we are not filling the final row
         }
@@ -175,25 +185,28 @@ function createImage() {
 }
 
 // creates a circle mask on the given layer
-function createCircleMask(doc, mainLayer) {
+function createCircleMask(doc, sourceLayers) {
     // open the mask
     var maskLayer = openAsLayer(File(scriptPath + "misc/circleStickerMask.png"), doc);
     maskLayer.name = "Mask";
 
     // resize the mask
-    var maskResizeWidthPercent = (columnWidth / maskLayer.bounds[2] - maskLayer.bounds[0]) * 100;
-    var maskResizeHeightPercent = (rowHeight / maskLayer.bounds[3] - maskLayer.bounds[1]) * 100;
+    var maskResizeWidthPercent = (columnWidth / (maskLayer.bounds[2] - maskLayer.bounds[0])) * 100;
+    var maskResizeHeightPercent = (rowHeight / (maskLayer.bounds[3] - maskLayer.bounds[1])) * 100;
     maskLayer.resize(maskResizeWidthPercent, maskResizeHeightPercent, AnchorPosition.TOPLEFT);
 
     // select the mask
     doc.selection.load(doc.channels.getByName("Red"), SelectionType.REPLACE); // since its a mask any channel works
 
-    // apply the mask to the main layer
-    doc.activeLayer = mainLayer;
-    doc.selection.clear();
-    doc.selection.deselect();
+    // apply the mask to every layer
+    for (var i = 0; i < sourceLayers.length; i++) {
+        doc.activeLayer = sourceLayers[i];
+        doc.selection.clear();
+    }
 
+    
     // remove mask layer
+    doc.selection.deselect();
     maskLayer.remove();
 }
 

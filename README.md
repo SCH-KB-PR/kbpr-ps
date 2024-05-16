@@ -1,4 +1,4 @@
-# KBPR Photoshop Script <img src="https://www.kbpr.sch.bme.hu/assets/kbpr-logo-81e3a2a912d597f79caa1ed39d000cbd6ae9194b61ea7f0a3a97059a47e55919.svg" width="128" align="right">
+# KBPR Photoshop Script <img src="https://raw.githubusercontent.com/Gilgames32/kbpr-ps/main/misc/kbpr-logo.svg" width="128" align="right">
 
 
 ## Fejlesztést segítő linkek
@@ -7,9 +7,9 @@
 - [VSCode extension Extendscript debuggolásra](https://marketplace.visualstudio.com/items?itemName=Adobe.extendscript-debug)
 
 ## TODO/ötletek:
-- hajtogatható design gyorsabb matrica vágáshoz (papír vastagság!)
+- hajtogatható design gyorsabb matrica vágáshoz (papír vastagság!), gutter pontosítás
 - dummy guide és tooltippek
-- kitűző preset
-- mappa funkció -> minden nyújtva lesz amúgy is
+- kitűző preset :madfunny:
 - fejlesztői guide?
-- lehetne matricát gutter nélkül?
+- use foreach like an actual programmer xd
+- max sorok / magasság csak hogy ne haljon meg ram hiányában

@@ -1,12 +1,5 @@
 const fileName = "KBPR";
 
-// modes
-const FileModes = {
-    FILE: "Fájl",
-    FOLDER: "Mappa"
-};
-const FileModesArray = getValues(FileModes); // i despise this language
-
 const RollWidthsArray = [610, 914, 1067];
 
 const PaperSizes = {
@@ -22,17 +15,18 @@ const PaperSizes = {
     STICKER: { name: "Körmatrica", width: 72, height: 72 },
     OTHER: { name: "Egyéb...", width: 100, height: 100 }
 };
-const PaperSizesArray = getValues(PaperSizes);
+const PaperSizesArray = getValues(PaperSizes); // i despise this language
 
 // setting variables
 var fileAspectLock = true;                  // aspect ratio lock is enabled by default
 var selectedFileAspect = 1;                 // width / height, 1 by default
 var selectedFile = null;                    // selected file, null by default
 var selectedFolder = null;                  // selected folder, null by default
-var selectedMode = FileModes.FILE;          // default mode
+var selectedFileList = [null];              // list of files in the selected folder
+var multiFileMode = false;                  // multi file mode disabled by default
 var selectedRollWidth = RollWidthsArray[0]; // default roll width = 610
 var selectedPaperSize = PaperSizes.A4;      // default paper size = A4
-var quantity = 20;                          // default quantity
+var quantityMultiplier = 20;                // default quantity multiplier
 var quantityCorrectionEnabled = false;      // quantity correction disabled by default
 var margin = 5;                             // default margin = 5 mm
 var gutter = 2;                             // default gutter = 2 mm
