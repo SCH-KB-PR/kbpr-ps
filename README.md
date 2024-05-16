@@ -15,3 +15,4 @@
 - méretre nyújtás ha nem stimmel a képarány -> rotatesource checkbox
 - mappa funkció -> minden nyújtva lesz amúgy is
 - fejlesztői guide?
+- lehetne matricát gutter nélkül?

@@ -105,8 +105,8 @@ function preCalcGrid() {
     preCalcInfoValues.text =
         (rotate ? "Igen" : "Nem") + "\n" +
         columnNum + " \u00D7 " + rowNum + " db\n" +
-        columnWidth + " \u00D7 " + rowHeight + " mm\n" +
-        documentWidth + " \u00D7 " + documentHeight + " mm";
+        Math.round(columnWidth) + " \u00D7 " + Math.round(rowHeight) + " mm\n" +
+        Math.round(documentWidth) + " \u00D7 " + Math.round(documentHeight) + " mm";
 
     // this is a terrible way of doing this
 
@@ -140,9 +140,9 @@ function createImage() {
     mainLayer.name = "Image";
 
     // resize the layer
-    // TODO: stretch if needed
-    var resizePercent = (columnWidth / mainLayer.bounds[2] - mainLayer.bounds[0]) * 100;
-    mainLayer.resize(resizePercent, resizePercent, AnchorPosition.TOPLEFT);
+    var resizeWidthPercent = (columnWidth / mainLayer.bounds[2] - mainLayer.bounds[0]) * 100;
+    var resizeHeightPercent = (rowHeight / mainLayer.bounds[3] - mainLayer.bounds[1]) * 100;
+    mainLayer.resize(resizeWidthPercent, resizeHeightPercent, AnchorPosition.TOPLEFT);
 
     // duplicate the layer to match quanity
     for (var i = 0; i < finalQuantity - 1; i++) {
