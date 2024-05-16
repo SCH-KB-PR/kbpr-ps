@@ -204,6 +204,7 @@ var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, {
                 lockRatioCheckbox.value = fileAspectLock;
                 lockRatioCheckbox.onClick = function () {
                     fileAspectLock = lockRatioCheckbox.value;
+                    paperSizeWidth.notify();
                 }
 
                 var paperDimensionsGroup = paperSizeGroup.add("group");
