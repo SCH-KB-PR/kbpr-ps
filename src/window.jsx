@@ -1,8 +1,3 @@
-#target "photoshop"
-#include "document.jsx"
-
-var scriptPath = File($.fileName).path;
-
 // ui constants
 const uicHeight = 20;
 const defaultMarginWidth = 5;
@@ -12,46 +7,6 @@ const unitWidth = 35;
 const miscWidth = 10;
 const longDataWidth = dataWidth + defaultMarginWidth + unitWidth;
 const buttonWidth = 100;
-
-
-// DEFAULT VALUES
-// modes
-const FileModes = {
-    FILE: "Fájl",
-    FOLDER: "Mappa"
-};
-const FileModesArray = getValues(FileModes); // i despise this language
-
-const RollWidthsArray = [610, 914, 1067];
-
-const PaperSizes = {
-    A0: { name: "A0", width: 841, height: 1189 },
-    A1: { name: "A1", width: 594, height: 841 },
-    A2: { name: "A2", width: 420, height: 594 },
-    A3: { name: "A3", width: 297, height: 420 },
-    A4: { name: "A4", width: 210, height: 297 },
-    A5: { name: "A5", width: 148, height: 210 },
-    A6: { name: "A6", width: 105, height: 148 },
-    A7: { name: "A7", width: 74, height: 105 },
-    POSTER: { name: "Nagyplakát", width: 914, height: 1600 },
-    STICKER: { name: "Körmatrica", width: 71, height: 71 },
-    OTHER: { name: "Egyéb...", width: 100, height: 100 }
-};
-const PaperSizesArray = getValues(PaperSizes);
-
-// setting variables
-var fileAspectLock = true;                  // aspect ratio lock is enabled by default
-var selectedFileAspect = 1;                 // width / height, 1 by default
-var selectedFile = null;                    // selected file, null by default
-var selectedFolder = null;                  // selected folder, null by default
-var selectedMode = FileModes.FILE;          // default mode
-var selectedRollWidth = RollWidthsArray[0]; // default roll width = 610
-var selectedPaperSize = PaperSizes.A4;      // default paper size = A4
-var quantity = 20;                          // default quantity
-var quantityCorrectionEnabled = false;      // quantity correction disabled by default
-var margin = 5;                             // default margin = 5 mm
-var gutter = 2;                             // default gutter = 2 mm
-var guide = true;                           // guide is enabled by default
 
 var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, { closeButton: true });
 {
@@ -116,6 +71,7 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
                 }
             }
         }
+        modeDropdown.onChange();
     }
 
     var paperPanel = mainWindow.add("panel", undefined, "Papír");
@@ -230,7 +186,7 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
                     paperSizeWidth.onChange = function () {
                         selectedPaperSize.width = parseHuFloat(paperSizeWidth.text);
                         if (isNaN(selectedPaperSize.width) || selectedPaperSize.width < 1) selectedPaperSize.width = 1;
-                        
+
                         if (fileAspectLock) selectedPaperSize.height = selectedPaperSize.width / selectedFileAspect;
 
                         paperSizeWidth.text = selectedPaperSize.width;
@@ -240,7 +196,7 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
                     paperSizeHeight.onChange = function () {
                         selectedPaperSize.height = parseHuFloat(paperSizeHeight.text);
                         if (isNaN(selectedPaperSize.height) || selectedPaperSize.height < 1) selectedPaperSize.height = 1;
-                        
+
                         if (fileAspectLock) selectedPaperSize.width = selectedPaperSize.height * selectedFileAspect;
 
                         paperSizeHeight.text = selectedPaperSize.height;
@@ -330,7 +286,7 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
         submitGroup.alignment = "center";
         var submitButton = submitGroup.add("button", boundsGen(buttonWidth), "OK");
         submitButton.onClick = function () {
-            if (create()) mainWindow.close();
+            if (createImage()) mainWindow.close();
         }
 
         var feedbackButton = submitGroup.add("button", boundsGen(buttonWidth), "Hibajelzés");
@@ -356,11 +312,6 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
         }
     }
 }
-
-// initialize
-modeDropdown.onChange();
-preCalcGrid();
-mainWindow.show();
 
 // Object.values() is not supported in ES3 :(
 function getValues(obj) {

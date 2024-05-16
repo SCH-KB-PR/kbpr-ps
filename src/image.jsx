@@ -1,9 +1,7 @@
+// image constants
 const ppi = 300;
-// TODO: redundant
 const inchToMm = 25.4;
 const pixelToMm = inchToMm / ppi;
-
-const fileName = "KBPR";
 
 preferences.rulerUnits = Units.MM;
 preferences.typeUnits = TypeUnits.MM;
@@ -112,7 +110,7 @@ function preCalcGrid() {
 
 // creates the canvas and places the images
 // returns true if the operation was successful
-function create() {
+function createImage() {
     // checks
     if (selectedMode == FileModes.FOLDER) {
         alert("Nem implementált funkció!")

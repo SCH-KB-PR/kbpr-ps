@@ -5,7 +5,7 @@
             "request": "launch",
             "name": "KBPR Script Debug",
             "hostAppSpecifier": "photoshop",
-            "script": "${workspaceFolder}/rewrite.jsx",
+            "script": "${workspaceFolder}/kbpr-rewrite.jsx",
         }
     ]
 }
