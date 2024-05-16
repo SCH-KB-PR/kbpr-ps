@@ -46,6 +46,7 @@ function dummyCheck() {
 // recalculate the grid parameters if a setting has changed to preview the result
 // returns true if it fits
 var documentWidth, documentHeight;
+var wasteMargin;
 var rotate;
 var columnNum, rowNum;
 var columnWidth, rowHeight;
@@ -93,6 +94,9 @@ function preCalcGrid() {
 
     // calculate the corrected quantity
     correctedQuantity = columnNum * rowNum;
+
+    // calculate the initial gap on the side
+    wasteMargin = (documentWidth - (columnNum * (columnWidth + gutter) - gutter)) / 2;
 
 
     // update ui
@@ -144,18 +148,9 @@ function createImage() {
     var resizeHeightPercent = (rowHeight / mainLayer.bounds[3] - mainLayer.bounds[1]) * 100;
     mainLayer.resize(resizeWidthPercent, resizeHeightPercent, AnchorPosition.TOPLEFT);
 
-    if (true) {
-        var maskLayer = openAsLayer(File(scriptPath + "misc/circleStickerMask.png"), doc);
-        var maskResizeWidthPercent; // ...
-        // TODO: resize
-        doc.selection.load(doc.channels.getByName("Red"), SelectionType.REPLACE); // since its a mask any channel works
-        
-        // Make a selection from the path
-        // ellipsePath.makeSelection();
-        // doc.selection.select(ellipseSelection, SelectionType.ELLIPSE, 0, true); // anti aliased
-        // doc.selection.invert();
-        // doc.selection.clear();
-        // doc.selection.deselect();
+    // apply mask if needed
+    if (circleMask) {
+        createCircleMask(doc, mainLayer);
     }
 
     // duplicate the layer to match quanity
@@ -167,7 +162,7 @@ function createImage() {
     var counter = 0;
     for (var i = 0; i < rowNum; i++) {
         for (var j = 0; j < columnNum; j++) {
-            doc.artLayers[i * columnNum + j].translate(j * (columnWidth + gutter), i * (rowHeight + gutter));
+            doc.artLayers[i * columnNum + j].translate(wasteMargin + j * (columnWidth + gutter), i * (rowHeight + gutter));
             if (++counter >= finalQuantity) break; // if we are not filling the final row
         }
     }
@@ -177,6 +172,29 @@ function createImage() {
     }
 
     return true;
+}
+
+// creates a circle mask on the given layer
+function createCircleMask(doc, mainLayer) {
+    // open the mask
+    var maskLayer = openAsLayer(File(scriptPath + "misc/circleStickerMask.png"), doc);
+    maskLayer.name = "Mask";
+
+    // resize the mask
+    var maskResizeWidthPercent = (columnWidth / maskLayer.bounds[2] - maskLayer.bounds[0]) * 100;
+    var maskResizeHeightPercent = (rowHeight / maskLayer.bounds[3] - maskLayer.bounds[1]) * 100;
+    maskLayer.resize(maskResizeWidthPercent, maskResizeHeightPercent, AnchorPosition.TOPLEFT);
+
+    // select the mask
+    doc.selection.load(doc.channels.getByName("Red"), SelectionType.REPLACE); // since its a mask any channel works
+
+    // apply the mask to the main layer
+    doc.activeLayer = mainLayer;
+    doc.selection.clear();
+    doc.selection.deselect();
+
+    // remove mask layer
+    maskLayer.remove();
 }
 
 // creates the guides on the borders of the tiles
@@ -196,6 +214,7 @@ function createGuides(doc) {
     // we have to convert the units to points
     var documentWidthPt = mmToPt(documentWidth);
     var documentHeightPt = mmToPt(documentHeight);
+    var wasteMarginPt = mmToPt(wasteMargin);
     var columnWidthPt = mmToPt(columnWidth);
     var rowHeightPt = mmToPt(rowHeight);
     var gutterPt = mmToPt(gutter);
@@ -204,7 +223,7 @@ function createGuides(doc) {
 
     // vertical lines
     for (var i = 0; i < columnNum; i++) {
-        var pre = i * (columnWidthPt + gutterPt);
+        var pre = wasteMarginPt + i * (columnWidthPt + gutterPt);
         var post = pre + columnWidthPt;
         lines.push(createLineSubPath([pre, 0], [pre, documentHeightPt]));
         lines.push(createLineSubPath([post, 0], [post, documentHeightPt]));

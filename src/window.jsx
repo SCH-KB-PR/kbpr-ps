@@ -56,7 +56,6 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
                         }
                     }
                     pathText.text = selectedFile ? selectedFile.fsName : "";
-
                 }
             }
 
@@ -77,39 +76,29 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
     var paperPanel = mainWindow.add("panel", undefined, "Papír");
     {
         paperPanel.alignChildren = "fill";
+        paperPanel.orientation = "row";
 
-        // roll width and margin
-        var rollWidthGroup = paperPanel.add("group");
+        // left column
+        var paperStandardsGroup = paperPanel.add("group");
         {
-            rollWidthGroup.add("statictext", boundsGen(propertyWidth), "Papírhenger:").justify = "right";
-            var rollWidthDropdown = rollWidthGroup.add("dropdownlist", boundsGen(dataWidth), RollWidthsArray);
-            rollWidthDropdown.selection = 0;
-            rollWidthGroup.add("statictext", boundsGen(unitWidth), "mm");
-            rollWidthDropdown.onChange = function () {
-                selectedRollWidth = RollWidthsArray[rollWidthDropdown.selection.index];
-                preCalcGrid();
+            paperStandardsGroup.orientation = "column";
+            paperStandardsGroup.alignChildren = "fill";
+            
+            // roll width and margin
+            var rollWidthGroup = paperStandardsGroup.add("group");
+            {
+                rollWidthGroup.add("statictext", boundsGen(propertyWidth), "Papírhenger:").justify = "right";
+                var rollWidthDropdown = rollWidthGroup.add("dropdownlist", boundsGen(dataWidth), RollWidthsArray);
+                rollWidthDropdown.selection = 0;
+                rollWidthGroup.add("statictext", boundsGen(unitWidth), "mm");
+                rollWidthDropdown.onChange = function () {
+                    selectedRollWidth = RollWidthsArray[rollWidthDropdown.selection.index];
+                    preCalcGrid();
+                }
             }
-
-            rollWidthGroup.add("statictext", boundsGen(propertyWidth), "Margó:").justify = "right";
-            var marginField = rollWidthGroup.add("edittext", boundsGen(dataWidth), margin);
-            var marginUnit = rollWidthGroup.add("statictext", boundsGen(unitWidth), "mm");
-            marginField.onChange = function () {
-                margin = parseHuFloat(marginField.text);
-                if (isNaN(margin) || margin < 0) margin = 0;
-                marginField.text = margin;
-                preCalcGrid();
-            }
-
-        }
-
-        // paper size selection
-        var paperGroup = paperPanel.add("group");
-        {
-            paperGroup.orientation = "row";
-            paperGroup.alignChildren = "top";
 
             // paper preset sizes
-            var paperPresetGroup = paperGroup.add("group");
+            var paperPresetGroup = paperStandardsGroup.add("group");
             {
                 paperPresetGroup.add("statictext", boundsGen(propertyWidth), "Papírméret:").justify = "right";
                 var paperSizeDropdown = paperPresetGroup.add("dropdownlist", boundsGen(longDataWidth));
@@ -121,68 +110,94 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
                     paperSizeHeight.text = selectedPaperSize.height;
 
                     // make the custom paper size editable
-                    lockRatioCheckbox.enabled = paperSizeHeight.enabled = paperSizeWidth.enabled = selectedPaperSize == PaperSizes.OTHER;
+                    paperSizeGroup.enabled = selectedPaperSize == PaperSizes.OTHER;
 
                     // aspect ratio calculation
                     if (selectedFile != null && selectedPaperSize == PaperSizes.OTHER) calcAspectRatio(selectedFile);
 
                     // nagyplakát preset
                     if (selectedPaperSize == PaperSizes.POSTER) {
+                        rollWidthGroup.enabled = false;
                         rollWidthDropdown.selection = 1;    // 914
 
-                        quantityField.text = quantity = 1;
-                        quantityField.enabled = false;
-
-                        correctedQuantityCheckbox.value = quantityCorrectionEnabled = false;
-                        correctedQuantityCheckbox.enabled = false;
-
+                        paperDetailsGroup.enabled = false;
                         marginField.text = margin = 0;
-                        marginField.enabled = false;
 
+                        quantityPanel.enabled = false;
+                        quantityField.text = quantity = 1;
+                        correctedQuantityCheckbox.value = quantityCorrectionEnabled = false;
+
+                        layoutPanel.enabled = false;
                         gutterField.text = gutter = 0;
-                        gutterField.enabled = false;
-
                         guideCheckbox.value = guide = false;
-                        guideCheckbox.enabled = false;
                     }
                     else {
-                        quantityField.enabled = true;
-                        marginField.enabled = true;
-                        correctedQuantityCheckbox.enabled = true;
-                        gutterField.enabled = true;
-                        guideCheckbox.enabled = true;
+                        rollWidthGroup.enabled = true;
+                        paperDetailsGroup.enabled = true;
+                        quantityPanel.enabled = true;
+                        layoutPanel.enabled = true;
+                    }
+
+                    // circlemask only for stickers and custom sizes TODO: badge
+                    if (selectedPaperSize == PaperSizes.STICKER) {
+                        circleMaskGroup.enabled = circleMaskCheckBox.value = circleMask = true;
+                    }
+                    else if (selectedPaperSize == PaperSizes.OTHER) {
+                        circleMaskGroup.enabled = true; // leave value unchanged
+                    }
+                    else {
+                        circleMaskGroup.enabled = circleMaskCheckBox.value = circleMask = false;
                     }
 
                     preCalcGrid();
                 }
             }
+        }
+
+
+        // paper size selection
+        var paperDetailsGroup = paperPanel.add("group");
+        {
+            paperDetailsGroup.orientation = "column";
+
+            // roll margin
+            var rollMarginGroup = paperDetailsGroup.add("group");
+            {
+                rollMarginGroup.add("statictext", boundsGen(propertyWidth), "Margó:").justify = "right";
+                var marginField = rollMarginGroup.add("edittext", boundsGen(dataWidth), margin);
+                var marginUnit = rollMarginGroup.add("statictext", boundsGen(unitWidth), "mm");
+                marginField.onChange = function () {
+                    margin = parseHuFloat(marginField.text);
+                    if (isNaN(margin) || margin < 0) margin = 0;
+                    marginField.text = margin;
+                    preCalcGrid();
+                }
+            }
 
             // custom paper size
-            var paperDetailsGroup = paperGroup.add("group");
+            var paperSizeGroup = paperDetailsGroup.add("group");
             {
-                paperDetailsGroup.orientation = "row";
+                paperSizeGroup.orientation = "row";
+                paperStandardsGroup.alignChildren = "fill";
 
-                paperDetailsGroup.add("statictext", boundsGen(propertyWidth - 32)); // spacer
-                var lockRatioCheckbox = paperDetailsGroup.add("checkbox");
+                paperSizeGroup.add("statictext", boundsGen(propertyWidth - 36)); // spacer, magic number :D
+                var lockRatioCheckbox = paperSizeGroup.add("checkbox");
                 lockRatioCheckbox.value = fileAspectLock;
-                lockRatioCheckbox.enabled = false;
                 lockRatioCheckbox.onClick = function () {
                     fileAspectLock = lockRatioCheckbox.value;
                 }
 
-                var paperSizeGroup = paperDetailsGroup.add("group");
+                var paperDimensionsGroup = paperSizeGroup.add("group");
                 {
-                    paperSizeGroup.orientation = "column";
-                    var paperSizeWidthGroup = paperSizeGroup.add("group");
-                    var paperSizeHeightGroup = paperSizeGroup.add("group");
+                    paperDimensionsGroup.orientation = "column";
+                    var paperSizeWidthGroup = paperDimensionsGroup.add("group");
+                    var paperSizeHeightGroup = paperDimensionsGroup.add("group");
 
                     var paperSizeWidth = paperSizeWidthGroup.add("edittext", boundsGen(dataWidth), selectedPaperSize.width);
                     var paperSizeHeight = paperSizeHeightGroup.add("edittext", boundsGen(dataWidth), selectedPaperSize.height);
                     paperSizeWidthGroup.add("statictext", boundsGen(unitWidth), "mm");
                     paperSizeHeightGroup.add("statictext", boundsGen(unitWidth), "mm");
 
-
-                    paperSizeWidth.enabled = paperSizeHeight.enabled = false;
                     paperSizeWidth.onChange = function () {
                         selectedPaperSize.width = parseHuFloat(paperSizeWidth.text);
                         if (isNaN(selectedPaperSize.width) || selectedPaperSize.width < 1) selectedPaperSize.width = 1;
@@ -204,6 +219,8 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
                         preCalcGrid();
                     }
                 }
+
+                paperSizeGroup.enabled = false;
             }
         }
     }
@@ -234,7 +251,7 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
         }
     }
 
-    // gutter and guide
+    // gutter, guide and circle mask
     var layoutPanel = mainWindow.add("panel", undefined, "Elrendezés");
     {
         layoutPanel.alignChildren = "fill";
@@ -244,6 +261,8 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
         {
             layoutSettingsGroup.alignChildren = "fill";
             layoutSettingsGroup.orientation = "column";
+
+            // gutter
             var gutterGroup = layoutSettingsGroup.add("group");
             {
                 gutterGroup.add("statictext", boundsGen(propertyWidth), "Köz:").justify = "right";
@@ -257,6 +276,7 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
                 }
             }
 
+            // guide
             var guideGroup = layoutSettingsGroup.add("group");
             {
                 guideGroup.add("statictext", boundsGen(propertyWidth), "Segédvonalak:").justify = "right";
@@ -265,6 +285,19 @@ var mainWindow = new Window("dialog", "KBPR script - REWRITE BETA", undefined, {
                 guideCheckbox.onClick = function () {
                     guide = guideCheckbox.value;
                 }
+            }
+
+            // circle mask
+            var circleMaskGroup = layoutSettingsGroup.add("group");
+            {
+                circleMaskGroup.add("statictext", boundsGen(propertyWidth), "Körmaszk:").justify = "right";
+                var circleMaskCheckBox = circleMaskGroup.add("checkbox", boundsGen(dataWidth));
+                circleMaskCheckBox.value = circleMask;
+                circleMaskCheckBox.onClick = function () {
+                    circleMask = circleMaskCheckBox.value;
+                }
+
+                circleMaskGroup.enabled = false;
             }
         }
 
