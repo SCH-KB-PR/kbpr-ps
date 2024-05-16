@@ -1,4 +1,3 @@
-const scriptPath = File($.fileName).path;
 const fileName = "KBPR";
 
 // modes

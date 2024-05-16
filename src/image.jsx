@@ -136,13 +136,27 @@ function createImage() {
     var doc = app.documents.add(documentWidth, documentHeight, ppi, fileName, NewDocumentMode.RGB);
 
     // open the file
-    var mainLayer = openAsLayer(selectedFile, app.activeDocument, rotate);
+    var mainLayer = openAsLayer(selectedFile, doc, rotate);
     mainLayer.name = "Image";
 
     // resize the layer
     var resizeWidthPercent = (columnWidth / mainLayer.bounds[2] - mainLayer.bounds[0]) * 100;
     var resizeHeightPercent = (rowHeight / mainLayer.bounds[3] - mainLayer.bounds[1]) * 100;
     mainLayer.resize(resizeWidthPercent, resizeHeightPercent, AnchorPosition.TOPLEFT);
+
+    if (true) {
+        var maskLayer = openAsLayer(File(scriptPath + "misc/circleStickerMask.png"), doc);
+        var maskResizeWidthPercent; // ...
+        // TODO: resize
+        doc.selection.load(doc.channels.getByName("Red"), SelectionType.REPLACE); // since its a mask any channel works
+        
+        // Make a selection from the path
+        // ellipsePath.makeSelection();
+        // doc.selection.select(ellipseSelection, SelectionType.ELLIPSE, 0, true); // anti aliased
+        // doc.selection.invert();
+        // doc.selection.clear();
+        // doc.selection.deselect();
+    }
 
     // duplicate the layer to match quanity
     for (var i = 0; i < finalQuantity - 1; i++) {
@@ -231,6 +245,8 @@ function createLineSubPath(c1, c2) {
 
 // opens the file as a layer to the target document
 function openAsLayer(file, target, rotate) {
+    if (rotate == undefined) rotate = false;
+
     var doc = app.open(file);
 
     if (rotate != doc.width > doc.height) {
