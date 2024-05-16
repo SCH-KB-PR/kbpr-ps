@@ -6,7 +6,7 @@ const dataWidth = 60;
 const unitWidth = 35;
 const miscWidth = 10;
 const longDataWidth = dataWidth + defaultMarginWidth + unitWidth;
-const buttonWidth = 100;
+const buttonWidth = 80;
 
 var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, { closeButton: true });
 {
@@ -32,6 +32,18 @@ var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, {
                 
                 preCalcGrid();
             }
+
+            modeSelectGroup.add("statictext", boundsGen(98), ""); // spacer, dont ask
+            // TODO: hopefully remove this
+            var feedbackButton = modeSelectGroup.add("button", boundsGen(buttonWidth), "Hibajelzés");
+            feedbackButton.onClick = function () {
+                openLink("https://github.com/Gilgames32/kbpr-ps/issues/new");
+            }
+
+            var helpButton = modeSelectGroup.add("button", boundsGen(buttonWidth), "Súgó");
+            helpButton.onClick = function () {
+                openLink("https://github.com/Gilgames32/kbpr-ps/wiki");
+            }
         }
 
         // path selection
@@ -41,7 +53,7 @@ var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, {
             pathLabel.justify = "right";
             var pathText = pathGroup.add("statictext", boundsGen(longDataWidth + defaultMarginWidth + propertyWidth + defaultMarginWidth + unitWidth));
             pathText.justify = "right";
-            var pathBrowseButton = pathGroup.add("button", boundsGen(unitWidth), "Tallózás...");
+            var pathBrowseButton = pathGroup.add("button", boundsGen(buttonWidth), "Tallózás...");
 
             pathBrowseButton.onClick = function (){
                 // folder
@@ -327,29 +339,12 @@ var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, {
     var submitGroup = mainWindow.add("group");
     {
         submitGroup.alignment = "center";
-        var submitButton = submitGroup.add("button", boundsGen(buttonWidth), "OK");
+        var submitButton = submitGroup.add("button", undefined, "OK");
         submitButton.onClick = function () {
             if (createImage()) mainWindow.close();
         }
 
-        var feedbackButton = submitGroup.add("button", boundsGen(buttonWidth), "Hibajelzés");
-        feedbackButton.onClick = function () {
-            var url = "https://github.com/Gilgames32/kbpr-ps/issues/new";
-            try {
-                // windows
-                app.system("start " + url);
-            } catch (error) {
-                try {
-                    // mac
-                    app.system("open " + url);
-                } catch (error) {
-                    // just in case
-                    alert("Jelezd a hibákat itt: " + url);
-                }
-            }
-        }
-
-        var cancelButton = submitGroup.add("button", boundsGen(buttonWidth), "Mégse");
+        var cancelButton = submitGroup.add("button", undefined, "Mégse");
         cancelButton.onClick = function () {
             mainWindow.close();
         }
@@ -382,4 +377,19 @@ function calcAspectRatio(file) {
     selectedFileAspect = doc.width / doc.height;
     doc.close(SaveOptions.DONOTSAVECHANGES);
     paperSizeWidth.notify();
+}
+
+function openLink(url) {
+    try {
+        // windows
+        app.system("start " + url);
+    } catch (error) {
+        try {
+            // mac
+            app.system("open " + url);
+        } catch (error) {
+            // just in case
+            alert(url);
+        }
+    }
 }
