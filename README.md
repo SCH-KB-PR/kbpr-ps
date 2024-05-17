@@ -9,6 +9,4 @@
 
 ## TODO/ötletek:
 - hajtogatható design gyorsabb matrica vágáshoz: gutter pontosítás, papír vastagság figyelembe vétele
-- kitűző preset :madfunny:
-- max sorok / magasság csak hogy ne haljon meg ram hiányában
 - png bounds fix

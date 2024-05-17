@@ -128,7 +128,7 @@ var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, {
                     // aspect ratio calculation
                     if (selectedFile != null && selectedPaperSize == PaperSizes.OTHER) calcAspectRatio(selectedFile);
 
-                    // TODO: pusztító switch case xddd
+                    // TODO: pusztító switch case for more presets xddd
 
                     // nagyplakát preset
                     if (selectedPaperSize == PaperSizes.POSTER) {

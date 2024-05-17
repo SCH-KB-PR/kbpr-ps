@@ -15,8 +15,7 @@ function columnNumCalc(docWidth, tileSize, gutter) {
     return Math.floor((docWidth + gutter) / (tileSize.width + gutter));
 }
 
-// calculates the wasted area of the documents side
-// TODO: take gutters into consideration
+// calculates the wasted area on the sides of the document
 function wasteCheck(docWidth, tileSize, gutter) {
     var columns = columnNumCalc(docWidth, tileSize, gutter);
     var width = columns * (tileSize.width + gutter) - gutter;
@@ -93,7 +92,6 @@ function preCalcGrid() {
     }
 
     // dimensions of the tiles
-    // TODO: cleanup 
     columnWidth = rotate ? paperSize.height : paperSize.width;
     rowHeight = rotate ? paperSize.width : paperSize.height;
 
@@ -175,7 +173,6 @@ function createImage() {
     var counter = 0;
     for (var i = 0; i < rowNum; i++) {
         for (var j = 0; j < columnNum; j++) {
-            // TODO: dont use doc.artLayers, have it stored elsewhere
             doc.artLayers[i * columnNum + j].translate(wasteMargin + j * (columnWidth + gutter), i * (rowHeight + gutter));
             if (++counter >= finalQuantity) break; // if we are not filling the final row
         }
@@ -225,7 +222,7 @@ function createGuides(doc) {
     app.foregroundColor.rgb.red = 0;
     app.foregroundColor.rgb.green = 0;
     app.foregroundColor.rgb.blue = 0;
-    // TODO: !!! we have to manually set the pencil size to 1px !!!
+    // !!! we have to manually set the pencil size to 1px for proper working !!!
 
     // we have to convert the units to points
     var documentWidthPt = mmToPt(documentWidth);
