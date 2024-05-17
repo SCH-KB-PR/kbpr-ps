@@ -150,8 +150,8 @@ function createImage() {
 
     // resize the layers
     for (var i = 0; i < sourceLayers.length; i++) {
-        layer.translate(-layer.bounds[0], -layer.bounds[1]); // this breaks transparent pngs, too bad
         var layer = sourceLayers[i];
+        layer.translate(-layer.bounds[0], -layer.bounds[1]); // this breaks transparent pngs, too bad
         var resizeWidthPercent = (columnWidth / (layer.bounds[2] - layer.bounds[0])) * 100;
         var resizeHeightPercent = (rowHeight / (layer.bounds[3] - layer.bounds[1])) * 100;
         layer.resize(resizeWidthPercent, resizeHeightPercent, AnchorPosition.TOPLEFT);
