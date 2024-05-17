@@ -171,6 +171,17 @@ var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, {
                     preCalcGrid();
                 }
             }
+
+            var paperResolutionGroup = paperStandardsGroup.add("group");
+            {
+                paperResolutionGroup.add("statictext", boundsGen(propertyWidth), "Felbontás:").justify = "right";
+                var paperResolutionDropdown = paperResolutionGroup.add("dropdownlist", boundsGen(dataWidth), ResolutionArray);
+                paperResolutionDropdown.selection = 0;
+                paperResolutionGroup.add("statictext", boundsGen(unitWidth), "ppi");
+                paperResolutionDropdown.onChange = function () {
+                    ppi = ResolutionArray[paperResolutionDropdown.selection.index];
+                }
+            }
         }
 
 

@@ -10,6 +10,5 @@
 ## TODO/ötletek:
 - hajtogatható design gyorsabb matrica vágáshoz: gutter pontosítás, papír vastagság figyelembe vétele
 - kitűző preset :madfunny:
-- use foreach like an actual programmer xd
 - max sorok / magasság csak hogy ne haljon meg ram hiányában
-- 600 ppi beállítás matricák miatt?
+- png bounds fix

@@ -18,6 +18,8 @@ const PaperSizes = {
 };
 const PaperSizesArray = getValues(PaperSizes); // i despise this language
 
+const ResolutionArray = [300, 600];
+
 // setting variables
 var fileAspectLock = true;                  // aspect ratio lock is enabled by default
 var selectedFileAspect = 1;                 // width / height, 1 by default
@@ -33,3 +35,4 @@ var margin = 5;                             // default margin = 5 mm
 var gutter = 2;                             // default gutter = 2 mm
 var guide = true;                           // guide is enabled by default
 var circleMask = false;                     // circle mask is disabled by default
+var ppi = ResolutionArray[0];               // default resolution = 300 dpi

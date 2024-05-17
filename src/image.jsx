@@ -1,17 +1,13 @@
 // image constants
-const ppi = 300;
 const inchToMm = 25.4;
-const mmToPixel = ppi / inchToMm;
-const mmToPoint = mmToPixel * 72 / ppi; // at 72 ppi 1px = 1pt
 
 preferences.rulerUnits = Units.MM;
 preferences.typeUnits = TypeUnits.MM;
 
 // convert mm to pt
 function mmToPt(mm) {
-    return mm * mmToPoint;
+    return mm * 72 / inchToMm; // at 72 ppi 1px = 1pt
 }
-
 
 // calculates the number of columns that can fit the document width
 function columnNumCalc(docWidth, tileSize, gutter) {
