@@ -35,6 +35,19 @@ function dummyCheck() {
         alert("Nem választottál ki mappát!");
         return false;
     }
+    if (selectedFileList.length == 0) {
+        alert("A kiválasztott mappa nem tartalmaz fájlokat!");
+        return false;
+    }
+    if (!preCalcGrid()) {
+        alert("Nem fér el a kiválasztott méretű papíron!");
+        return false;
+    }
+    if (documentHeight > maxDocumentHeight) {
+        alert("Túl nagy a dokumentum!");
+        return false;
+    }
+
     return true;
 }
 
@@ -125,11 +138,6 @@ function createImage() {
     // checks
     if (!dummyCheck()) return false;
 
-    if (!preCalcGrid()) {
-        alert("Nem fér el a kiválasztott méretű papíron!");
-        return false;
-    }
-
     // finalize quanitity
     const finalQuantity = quantityCorrectionEnabled ? correctedQuantity : actualQuantity;
 
@@ -200,7 +208,6 @@ function createCircleMask(doc, sourceLayers) {
         doc.selection.clear();
     }
 
-    
     // remove mask layer
     doc.selection.deselect();
     maskLayer.remove();

@@ -36,3 +36,6 @@ var gutter = 2;                             // default gutter = 2 mm
 var guide = true;                           // guide is enabled by default
 var circleMask = false;                     // circle mask is disabled by default
 var ppi = ResolutionArray[0];               // default resolution = 300 dpi
+
+// dont touch unless you know what you are doing
+const maxDocumentHeight = 10000; // 10 meters
