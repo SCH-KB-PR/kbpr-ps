@@ -1,6 +1,6 @@
 # Körmatrica sablon how-to
 
-A kör alakú matricákat nagyobbra nyomtatjuk mint amekkorák valójában, hogy pontatlan vágásnál se legyenek fehér szélek.
+A kör alakú matricákat nagyobbra nyomtatjuk, mint amekkorák valójában, hogy pontatlan vágásnál se legyenek fehér szélek.
 A vágó 70 mm átmérőjű, a script 72 mm-es köröket készít, van tehát egy hibahatár, ami vagy látszani fog, vagy nem. Ide **ne** rakjatok fontos infót/grafikát, de ne is legyen üres, legyen háttérszínű vagy a háttér minta folytatása.
 
 ## Lépések
@@ -18,8 +18,6 @@ Magyarázat:
    - minden piros legyen elrejtve
    - minden zöld legyen látható
    - (szemre kattintva tudod állítani)
-   - ![kép](https://github.com/Gilgames32/kbpr-ps/assets/91968230/7110e2b1-7847-45e1-8e95-deb406f72407)
-
-
+   - ![kép](https://github.com/Gilgames32/kbpr-ps/assets/91968230/6f8e15de-9e15-476d-beba-f00bc12ab567)
 
 6. Mentsd el, és kész is
