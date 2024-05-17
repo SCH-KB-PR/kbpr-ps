@@ -42,7 +42,7 @@ var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, {
 
             var helpButton = modeSelectGroup.add("button", boundsGen(buttonWidth), "Súgó");
             helpButton.onClick = function () {
-                openLink("https://github.com/Gilgames32/kbpr-ps/wiki");
+                openLink("https://github.com/Gilgames32/kbpr-ps/wiki/Dummy-guide");
             }
         }
 
