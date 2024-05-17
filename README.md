@@ -12,3 +12,4 @@
 - kitűző preset :madfunny:
 - use foreach like an actual programmer xd
 - max sorok / magasság csak hogy ne haljon meg ram hiányában
+- 600 ppi beállítás matricák miatt?
