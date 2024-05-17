@@ -132,11 +132,11 @@ var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, {
 
                     // nagyplakát preset
                     if (selectedPaperSize == PaperSizes.POSTER) {
-                        modeDropdown.selection = 0;
+                        modeCheckbox.value = multiFileMode = false;
                         modeSelectGroup.enabled = false;
 
                         rollWidthGroup.enabled = false;
-                        rollWidthDropdown.selection = 1;    // 914
+                        rollWidthDropdown.selection = 1; // 914
 
                         paperDetailsGroup.enabled = false;
                         marginField.text = margin = 0;
@@ -160,7 +160,7 @@ var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, {
                     // circlemask only for stickers, badges, and custom sizes
                     if (selectedPaperSize == PaperSizes.STICKER || selectedPaperSize == PaperSizes.BADGE) {
                         circleMaskGroup.enabled = circleMaskCheckBox.value = circleMask = true;
-                        ppi = ResolutionArray[1];
+                        paperResolutionDropdown.selection = 1; // 600 ppi
                     }
                     else if (selectedPaperSize == PaperSizes.OTHER) {
                         circleMaskGroup.enabled = true; // leave value unchanged
