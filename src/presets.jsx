@@ -13,6 +13,7 @@ const PaperSizes = {
     A7: { name: "A7", width: 74, height: 105 },
     POSTER: { name: "Nagyplakát", width: 914, height: 1600 },
     STICKER: { name: "Körmatrica", width: 72, height: 72 },
+    BADGE: { name: "Kitűző", width: 70, height: 70 },
     OTHER: { name: "Egyéb...", width: 100, height: 100 }
 };
 const PaperSizesArray = getValues(PaperSizes); // i despise this language
