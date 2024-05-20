@@ -158,11 +158,11 @@ var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, {
                     }
 
                     // circlemask only for stickers, badges, and custom sizes
-                    if (selectedPaperSize == PaperSizes.STICKER || selectedPaperSize == PaperSizes.BADGE) {
+                    if (selectedPaperSize == PaperSizes.STICKER) {
                         circleMaskGroup.enabled = circleMaskCheckBox.value = circleMask = true;
                         paperResolutionDropdown.selection = 1; // 600 ppi
                     }
-                    else if (selectedPaperSize == PaperSizes.OTHER) {
+                    else if (selectedPaperSize == PaperSizes.OTHER || selectedPaperSize == PaperSizes.BADGE) {
                         circleMaskGroup.enabled = true; // leave value unchanged
                     }
                     else {
