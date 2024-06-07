@@ -281,7 +281,8 @@ function openAsLayer(file, target, rotate) {
 
     var doc = app.open(file);
 
-    if (rotate != doc.width > doc.height) {
+    // if not custom size, then the image will determine the orientation
+    if ((selectedPaperSize == PaperSizes.OTHER && rotate) || (selectedPaperSize != PaperSizes.OTHER && rotate != doc.width > doc.height)) {
         doc.rotateCanvas(90);
     }
 
