@@ -47,6 +47,11 @@ function dummyCheck() {
         return false;
     }
 
+    if (documentHeight < minDocumentHeight) {
+        var choice = confirm("A dokumentum mérete kisebb mint a minimum nyomtatási méret (" + minDocumentHeight + " mm), ez némi extra felesleggel jár. Biztosan folytatod?");
+        if (!choice) return false;
+    }
+
     return true;
 }
 
