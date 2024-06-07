@@ -211,8 +211,9 @@ var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, {
                 paperSizeGroup.orientation = "row";
                 paperStandardsGroup.alignChildren = "fill";
 
-                paperSizeGroup.add("statictext", boundsGen(propertyWidth - 36)); // spacer, magic number :D
+                paperSizeGroup.add("statictext", boundsGen(13)); // spacer, magic number :D
                 var lockRatioCheckbox = paperSizeGroup.add("checkbox");
+                lockRatioCheckbox.helpTip = "arány rögzítése";
                 lockRatioCheckbox.value = fileAspectLock;
                 lockRatioCheckbox.onClick = function () {
                     fileAspectLock = lockRatioCheckbox.value;
@@ -224,9 +225,14 @@ var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, {
                     paperDimensionsGroup.orientation = "column";
                     var paperSizeWidthGroup = paperDimensionsGroup.add("group");
                     var paperSizeHeightGroup = paperDimensionsGroup.add("group");
+                    
+                    paperSizeWidthGroup.add("statictext", boundsGen(miscWidth*2), "W:").justify = "right";
+                    paperSizeHeightGroup.add("statictext", boundsGen(miscWidth*2), "H:").justify = "right";
+
 
                     var paperSizeWidth = paperSizeWidthGroup.add("edittext", boundsGen(dataWidth), selectedPaperSize.width);
                     var paperSizeHeight = paperSizeHeightGroup.add("edittext", boundsGen(dataWidth), selectedPaperSize.height);
+                    
                     paperSizeWidthGroup.add("statictext", boundsGen(unitWidth), "mm");
                     paperSizeHeightGroup.add("statictext", boundsGen(unitWidth), "mm");
 
