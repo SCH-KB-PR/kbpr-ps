@@ -37,12 +37,12 @@ var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, {
             // TODO: hopefully remove this
             var feedbackButton = modeSelectGroup.add("button", boundsGen(buttonWidth), "Hibajelzés");
             feedbackButton.onClick = function () {
-                openLink("https://github.com/Gilgames32/kbpr-ps/issues/new");
+                openLink("https://github.com/SCH-KB-PR/kbpr-ps/issues/new");
             }
 
             var helpButton = modeSelectGroup.add("button", boundsGen(buttonWidth), "Súgó");
             helpButton.onClick = function () {
-                openLink("https://github.com/Gilgames32/kbpr-ps/wiki/Dummy-guide");
+                openLink("https://github.com/SCH-KB-PR/kbpr-ps/wiki/Dummy-guide");
             }
         }
 
