@@ -8,7 +8,7 @@ const miscWidth = 10;
 const longDataWidth = dataWidth + defaultMarginWidth + unitWidth;
 const buttonWidth = 80;
 
-var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, { closeButton: true });
+var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: true });
 {
     mainWindow.alignChildren = "fill";
 
@@ -29,6 +29,7 @@ var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, {
                 selectedFileList = multiFileMode ? (selectedFolder != null ? selectedFolder.getFiles() : [null]) : [selectedFile];
                 quantityTypeLabel.text = multiFileMode ? "Szorzó:" : "Mennyiség:";
                 quantityUnit.text = multiFileMode ? "x" : "db";
+                quantityField.text = quantityMultiplier = multiFileMode ? 1 : quantityMultiplier;
                 
                 preCalcGrid();
             }
@@ -42,7 +43,7 @@ var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, {
 
             var helpButton = modeSelectGroup.add("button", boundsGen(buttonWidth), "Súgó");
             helpButton.onClick = function () {
-                openLink("https://github.com/SCH-KB-PR/kbpr-ps/wiki/Dummy-guide");
+                openLink("https://github.com/SCH-KB-PR/kbpr-ps/wiki");
             }
         }
 
@@ -358,6 +359,9 @@ var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, {
     var submitGroup = mainWindow.add("group");
     {
         submitGroup.alignment = "center";
+        var dummyButton = submitGroup.add("button", undefined, "Semmi");
+        dummyButton.onClick = function () {}
+
         var submitButton = submitGroup.add("button", undefined, "OK");
         submitButton.onClick = function () {
             if (createImage()) mainWindow.close();
@@ -367,6 +371,10 @@ var mainWindow = new Window("dialog", "KBPR script - rewrite BETA", undefined, {
         cancelButton.onClick = function () {
             mainWindow.close();
         }
+
+        // link buttons to enter and escape
+        mainWindow.defaultElement = dummyButton;
+        mainWindow.cancelElement = dummyButton;
     }
 }
 
