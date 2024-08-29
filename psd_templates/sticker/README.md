@@ -12,12 +12,12 @@ A vágó 70 mm átmérőjű, a script 72 mm-es köröket készít, van tehát eg
 > A piros rész hibahatárnak van, ezen belül fogunk vágni. Ügyelj arra, hogy a piros vonal **külső** széléig tartson a képed (különben fehér széle lesz és az csúnya (1.)), de a kép lénygi része a piroson **belül** maradjon (különben lehet, hogy le lesz vágva (2.))!
 
 Magyarázat:
-![magyarázat](https://github.com/Gilgames32/kbpr-ps/assets/91968230/01fb9f54-0a0e-47c0-abd7-1004ae06c226)
+![magyarázat](https://github.com/SCH-KB-PR/kbpr-ps/assets/91968230/01fb9f54-0a0e-47c0-abd7-1004ae06c226)
 
 5. Tűntetsd el a segédvonalakat:
    - minden piros legyen elrejtve
    - minden zöld legyen látható
    - (szemre kattintva tudod állítani)
-   - ![kép](https://github.com/Gilgames32/kbpr-ps/assets/91968230/6f8e15de-9e15-476d-beba-f00bc12ab567)
+   - ![kép](https://github.com/SCH-KB-PR/kbpr-ps/assets/91968230/6f8e15de-9e15-476d-beba-f00bc12ab567)
 
 6. Mentsd el, és kész is
