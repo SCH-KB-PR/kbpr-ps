@@ -12,7 +12,8 @@ const PaperSizes = {
     A6: { name: "A6", width: 105, height: 148 },
     A7: { name: "A7", width: 74, height: 105 },
     POSTER: { name: "Nagyplakát", width: 914, height: 1600 },
-    STICKER: { name: "Körmatrica", width: 72, height: 72 },
+    STICKER70: { name: "Körmatrica 70mm", width: 72, height: 72 },
+    STICKER49: { name: "Körmatrica 49mm", width: 51, height: 51 },
     BADGE: { name: "Kitűző", width: 72, height: 72 },
     OTHER: { name: "Egyéb...", width: 100, height: 100 }
 };
