@@ -297,3 +297,15 @@ function openAsLayer(file, target, rotate) {
 
     return layer;
 }
+
+function trySaveAndClose(){
+    try {
+        var file = File.saveDialog("Save As", "*.png");
+        if (file) {
+            app.activeDocument.saveAs(file, new PNGSaveOptions(), true, Extension.LOWERCASE);
+            app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
+        }
+    } catch (error) {
+        // we do not care
+    }
+}

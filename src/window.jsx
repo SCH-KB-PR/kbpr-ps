@@ -362,6 +362,14 @@ var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: t
         var dummyButton = submitGroup.add("button", undefined, "Semmi");
         dummyButton.onClick = function () {}
 
+        var pngButton = submitGroup.add("button", undefined, "PNG");
+        pngButton.onClick = function () {
+            if (createImage()) {
+                trySaveAndClose();
+                mainWindow.close();
+            }
+        }
+
         var submitButton = submitGroup.add("button", undefined, "OK");
         submitButton.onClick = function () {
             if (createImage()) mainWindow.close();
