@@ -243,8 +243,8 @@ var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: t
 
                         if (fileAspectLock) selectedPaperSize.height = selectedPaperSize.width / selectedFileAspect;
 
-                        paperSizeWidth.text = selectedPaperSize.width;
-                        paperSizeHeight.text = selectedPaperSize.height;
+                        paperSizeWidth.text = roundTo(selectedPaperSize.width, 4);
+                        paperSizeHeight.text = roundTo(selectedPaperSize.height, 4);
                         preCalcGrid();
                     }
                     paperSizeHeight.onChange = function () {
@@ -253,8 +253,8 @@ var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: t
 
                         if (fileAspectLock) selectedPaperSize.width = selectedPaperSize.height * selectedFileAspect;
 
-                        paperSizeHeight.text = selectedPaperSize.height;
-                        paperSizeWidth.text = selectedPaperSize.width;
+                        paperSizeHeight.text = roundTo(selectedPaperSize.height, 4);
+                        paperSizeWidth.text = roundTo(selectedPaperSize.width, 4);
                         preCalcGrid();
                     }
                 }
@@ -396,6 +396,11 @@ function boundsGen(w, h) {
 
 function parseHuFloat(text) {
     return parseFloat(text.replace(",", "."));
+}
+
+function roundTo(number, digits) {
+    var pow = Math.pow(10, digits);
+    return Math.round(number * pow) / pow;
 }
 
 function calcAspectRatio(file) {
