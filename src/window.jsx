@@ -127,7 +127,11 @@ var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: t
                     paperSizeGroup.enabled = selectedPaperSize == PaperSizes.OTHER;
 
                     // aspect ratio calculation
-                    if (selectedFile != null && selectedPaperSize == PaperSizes.OTHER) calcAspectRatio(selectedFile);
+                    if (selectedPaperSize == PaperSizes.OTHER) 
+                    {
+                        if (selectedFile != null) calcAspectRatio(selectedFile);
+                        if (selectedFolder != null) calcAspectRatio(selectedFileList[0]);
+                    }
 
                     // TODO: pusztító switch case for more presets xddd
 
