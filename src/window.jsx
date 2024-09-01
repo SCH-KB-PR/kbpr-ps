@@ -19,7 +19,9 @@ var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: t
         // mode selection 
         var modeSelectGroup = modePanel.add("group");
         {
-            modeSelectGroup.add("statictext", boundsGen(propertyWidth), "Több fájl:").justify = "right";
+            var modeSelectLabel = modeSelectGroup.add("statictext", boundsGen(propertyWidth), "Több fájl:")
+            modeSelectLabel.justify = "right";
+            modeSelectLabel.helpTip = "Be: kiválaszott mappa összes fájlja\nKi: kiválaszott fájl";
             var modeCheckbox = modeSelectGroup.add("checkbox");
 
             modeCheckbox.onClick = function () {
@@ -101,7 +103,9 @@ var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: t
             // roll width and margin
             var rollWidthGroup = paperStandardsGroup.add("group");
             {
-                rollWidthGroup.add("statictext", boundsGen(propertyWidth), "Papírhenger:").justify = "right";
+                var rollWidthLabel = rollWidthGroup.add("statictext", boundsGen(propertyWidth), "Papírtekercs:")
+                rollWidthLabel.justify = "right";
+                rollWidthLabel.helpTip = "Behelyezett papírtekercs szélesség";
                 var rollWidthDropdown = rollWidthGroup.add("dropdownlist", boundsGen(dataWidth), RollWidthsArray);
                 rollWidthDropdown.selection = 0;
                 rollWidthGroup.add("statictext", boundsGen(unitWidth), "mm");
@@ -114,7 +118,9 @@ var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: t
             // paper preset sizes
             var paperPresetGroup = paperStandardsGroup.add("group");
             {
-                paperPresetGroup.add("statictext", boundsGen(propertyWidth), "Papírméret:").justify = "right";
+                var paperPresetLabel = paperPresetGroup.add("statictext", boundsGen(propertyWidth), "Cellaméret:")
+                paperPresetLabel.justify = "right";
+                paperPresetLabel.helpTip = "Papírméret";
                 var paperSizeDropdown = paperPresetGroup.add("dropdownlist", boundsGen(longDataWidth));
                 for (var i in PaperSizes) paperSizeDropdown.add("item", PaperSizes[i].name);
                 paperSizeDropdown.selection = 4;
@@ -180,7 +186,9 @@ var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: t
 
             var paperResolutionGroup = paperStandardsGroup.add("group");
             {
-                paperResolutionGroup.add("statictext", boundsGen(propertyWidth), "Felbontás:").justify = "right";
+                var paperResolutionLabel = paperResolutionGroup.add("statictext", boundsGen(propertyWidth), "Felbontás:")
+                paperResolutionLabel.justify = "right";
+                paperResolutionLabel.helpTip = "Nyomtatási részletesség\nÁltalános esetben 300 ppi\nMatricákhoz 600 ppi";
                 var paperResolutionDropdown = paperResolutionGroup.add("dropdownlist", boundsGen(dataWidth), ResolutionArray);
                 paperResolutionDropdown.selection = 0;
                 paperResolutionGroup.add("statictext", boundsGen(unitWidth), "ppi");
@@ -199,7 +207,9 @@ var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: t
             // roll margin
             var rollMarginGroup = paperDetailsGroup.add("group");
             {
-                rollMarginGroup.add("statictext", boundsGen(propertyWidth), "Margó:").justify = "right";
+                var rollMarginLabel = rollMarginGroup.add("statictext", boundsGen(propertyWidth), "Margó:")
+                rollMarginLabel.justify = "right";
+                rollMarginLabel.helpTip = "Szélső margó\nNE ÁLLÍTSD ÁT, ha nem tudod mit csinálsz!";    // this tooltip cant stop me because i cant read
                 var marginField = rollMarginGroup.add("edittext", boundsGen(dataWidth), margin);
                 rollMarginGroup.add("statictext", boundsGen(unitWidth), "mm");
                 marginField.onChange = function () {
@@ -218,7 +228,7 @@ var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: t
 
                 paperSizeGroup.add("statictext", boundsGen(13)); // spacer, magic number :D
                 var lockRatioCheckbox = paperSizeGroup.add("checkbox");
-                lockRatioCheckbox.helpTip = "arány rögzítése";
+                lockRatioCheckbox.helpTip = "Képarány rögzítése";
                 lockRatioCheckbox.value = fileAspectLock;
                 lockRatioCheckbox.onClick = function () {
                     fileAspectLock = lockRatioCheckbox.value;
@@ -231,8 +241,12 @@ var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: t
                     var paperSizeWidthGroup = paperDimensionsGroup.add("group");
                     var paperSizeHeightGroup = paperDimensionsGroup.add("group");
                     
-                    paperSizeWidthGroup.add("statictext", boundsGen(miscWidth*2), "W:").justify = "right";
-                    paperSizeHeightGroup.add("statictext", boundsGen(miscWidth*2), "H:").justify = "right";
+                    var paperSizeWidthLabel = paperSizeWidthGroup.add("statictext", boundsGen(miscWidth*2), "W:")
+                    paperSizeWidthLabel.justify = "right";
+                    paperSizeWidthLabel.helpTip = "Szélesség";
+                    var paperSizeHeightLabel = paperSizeHeightGroup.add("statictext", boundsGen(miscWidth*2), "H:")
+                    paperSizeHeightLabel.justify = "right";
+                    paperSizeHeightLabel.helpTip = "Magasság";
 
 
                     var paperSizeWidth = paperSizeWidthGroup.add("edittext", boundsGen(dataWidth), selectedPaperSize.width);
@@ -278,7 +292,9 @@ var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: t
         var quantityField = quantityPanel.add("edittext", boundsGen(dataWidth), quantityMultiplier);
         var quantityUnit = quantityPanel.add("statictext", boundsGen(unitWidth), "db");
 
-        quantityPanel.add("statictext", boundsGen(propertyWidth), "Korrigálás:").justify = "right";
+        var correctedQuantityLabel = quantityPanel.add("statictext", boundsGen(propertyWidth), "Korrigálás:")
+        correctedQuantityLabel.justify = "right";
+        correctedQuantityLabel.helpTip = "Maradék hely kitöltése extra példányokkal";
         var correctedQuantityCheckbox = quantityPanel.add("checkbox", boundsGen(miscWidth));
         var correctedQuantityText = quantityPanel.add("statictext", boundsGen(unitWidth), correctedQuantity + " db");
         correctedQuantityText.enabled = quantityCorrectionEnabled;
@@ -311,7 +327,9 @@ var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: t
             // gutter
             var gutterGroup = layoutSettingsGroup.add("group");
             {
-                gutterGroup.add("statictext", boundsGen(propertyWidth), "Köz:").justify = "right";
+                var gutterLabel = gutterGroup.add("statictext", boundsGen(propertyWidth), "Köz:")
+                gutterLabel.justify = "right";
+                gutterLabel.helpTip = "Cellák közötti hely";
                 var gutterField = gutterGroup.add("edittext", boundsGen(dataWidth), gutter);
                 gutterUnit = gutterGroup.add("statictext", boundsGen(unitWidth), "mm");
                 gutterField.onChange = function () {
@@ -325,7 +343,9 @@ var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: t
             // guide
             var guideGroup = layoutSettingsGroup.add("group");
             {
-                guideGroup.add("statictext", boundsGen(propertyWidth), "Segédvonalak:").justify = "right";
+                var guideLabel = guideGroup.add("statictext", boundsGen(propertyWidth), "Segédvonalak:")
+                guideLabel.justify = "right";
+                guideLabel.helpTip = "Vágást segítő rácsvonalak";
                 var guideCheckbox = guideGroup.add("checkbox", boundsGen(dataWidth));
                 guideCheckbox.value = guide;
                 guideCheckbox.onClick = function () {
@@ -336,7 +356,9 @@ var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: t
             // circle mask
             var circleMaskGroup = layoutSettingsGroup.add("group");
             {
-                circleMaskGroup.add("statictext", boundsGen(propertyWidth), "Körmaszk:").justify = "right";
+                var circleMaskLabel = circleMaskGroup.add("statictext", boundsGen(propertyWidth), "Körmaszk:")
+                circleMaskLabel.justify = "right";
+                circleMaskLabel.helpTip = "Cellák tartalmának kör alakúra vágása";
                 var circleMaskCheckBox = circleMaskGroup.add("checkbox", boundsGen(dataWidth));
                 circleMaskCheckBox.value = circleMask;
                 circleMaskCheckBox.onClick = function () {
@@ -363,10 +385,20 @@ var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: t
     var submitGroup = mainWindow.add("group");
     {
         submitGroup.alignment = "center";
+
+        var nothingCounter = 0;
         var dummyButton = submitGroup.add("button", undefined, "Semmi");
-        dummyButton.onClick = function () {}
+        dummyButton.helpTip = "És milyen igaza van!";
+        dummyButton.onClick = function () {
+            nothingCounter++;
+            if (nothingCounter >= 10) {
+                alert("Miért nem hiszel nekem?");
+                nothingCounter = 0;
+            }
+        }
 
         var pngButton = submitGroup.add("button", undefined, "PNG");
+        pngButton.helpTip = "Generálás és mentés PNG formátumban";
         pngButton.onClick = function () {
             if (createImage()) {
                 trySaveAndClose();
