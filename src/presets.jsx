@@ -32,13 +32,14 @@ var selectedRollWidth = RollWidthsArray[0]; // default roll width = 610
 var selectedPaperSize = PaperSizes.A4;      // default paper size = A4
 var quantityMultiplier = 20;                // default quantity multiplier
 var quantityCorrectionEnabled = false;      // quantity correction disabled by default
-var margin = 5;                             // default margin = 5 mm
 var gutter = 2;                             // default gutter = 2 mm
 var guide = true;                           // guide is enabled by default
 var circleMask = false;                     // circle mask is disabled by default
 var ppi = ResolutionArray[0];               // default resolution = 300 dpi
 
+// plotter dependent settings
 // dont touch unless you know what you are doing
-const maxDocumentHeight = 10000; // 10 meters
-const minDocumentHeight = 203.2;   // 203.2 mm (8 inch)
-const safetyMargin = 2;                       // default bottom safety margin = 2 mm
+var margin = 3;                             // default margin = 3 mm
+const safetyMargin = 3;                     // default bottom safety margin = 3 mm
+const maxDocumentHeight = 18000;            // 18 meters (as if photoshop could handle that lmao)
+const minDocumentHeight = 101.6;            // 101.6 mm = 4 inches
