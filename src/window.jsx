@@ -38,7 +38,7 @@ var mainWindow = new Window("dialog", "KBPR script", undefined, { closeButton: t
             // TODO: hopefully remove this
             var feedbackButton = modeSelectGroup.add("button", boundsGen(buttonWidth), "Hibajelzés");
             feedbackButton.onClick = function () {
-                openLink("https://github.com/SCH-KB-PR/kbpr-ps/issues/new");
+                openLink("https://github.com/SCH-KB-PR/kbpr-ps/issues/new/choose");
             }
 
             var helpButton = modeSelectGroup.add("button", boundsGen(buttonWidth), "Súgó");
