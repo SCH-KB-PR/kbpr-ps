@@ -105,7 +105,7 @@ function preCalcGrid() {
     rowNum = Math.ceil(actualQuantity / columnNum);
 
     // total document height
-    documentHeight = rowNum * (rowHeight + gutter) - gutter + safetyMargin; // only bottom margin for now
+    documentHeight = rowNum * (rowHeight + gutter) - gutter;
 
     // calculate the corrected quantity
     correctedQuantity = columnNum * rowNum;
