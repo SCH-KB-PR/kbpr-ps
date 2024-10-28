@@ -1,6 +1,6 @@
 const fileName = "KBPR";
 
-const RollWidthsArray = [610, 914, 1067];
+const RollWidthsArray = [609.6, 914.4, 1066.8, 1117.6];
 
 const PaperSizes = {
     A0: { name: "A0", width: 841, height: 1189 },
